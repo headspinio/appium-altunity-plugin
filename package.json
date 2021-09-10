@@ -25,16 +25,27 @@
   },
   "main": "./build/index.js",
   "directories": {
-    "lib": "./lib"
+    "src": "./src"
   },
   "files": [
-    "lib",
-    "build"
+    "src",
+    "build",
+    "README",
+    "LICENSE"
   ],
   "dependencies": {
     "@appium/base-plugin": "^1.7.2"
   },
   "scripts": {
-    "clean": "rm -rf package-lock.json && rm -rf node_modules && npm install"
+    "clean": "rm -rf package-lock.json && rm -rf node_modules && npm install",
+    "build": "tsc",
+    "watch": "tsc --watch",
+    "test": "jest"
+  },
+  "devDependencies": {
+    "@types/jest": "^27.0.1",
+    "jest": "^27.1.1",
+    "ts-jest": "^27.0.5",
+    "typescript": "^4.4.2"
   }
 }
