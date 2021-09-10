@@ -1,0 +1,40 @@
+{
+  "name": "appium-altunity-plugin",
+  "description": "An Appium 2.0 plugin that gives direct access to the AltUnity tester server",
+  "tags": [
+    "appium",
+    "unity"
+  ],
+  "version": "0.0.1",
+  "author": "Jonathan Lipps <jlipps@gmail.com>",
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/headspin/appium-altunity-plugin"
+  },
+  "bugs": {
+    "url": "https://github.com/headspin/appium-altunity-plugin/issues"
+  },
+  "engines": {
+    "node": ">=14",
+    "npm": ">=7"
+  },
+  "appium": {
+    "pluginName": "altunity",
+    "mainClass": "AltUnityPlugin"
+  },
+  "main": "./build/index.js",
+  "directories": {
+    "lib": "./lib"
+  },
+  "files": [
+    "lib",
+    "build"
+  ],
+  "dependencies": {
+    "@appium/base-plugin": "^1.7.2"
+  },
+  "scripts": {
+    "clean": "rm -rf package-lock.json && rm -rf node_modules && npm install"
+  }
+}
