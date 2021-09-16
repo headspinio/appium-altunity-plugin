@@ -1,3 +1,5 @@
 export * from './general'
 export * from './find'
 export * from './actions'
+export * from './element'
+export * from './component'

@@ -1,3 +1,6 @@
+import type { AltTapArgs } from './commands/actions'
+import { AltUnityClient } from './index'
+
 type AltElementData = {
     name: string
     id: number
@@ -18,8 +21,10 @@ type AltElementData = {
 
 export default class AltElement {
     private data: AltElementData
+    private client: AltUnityClient
 
-    constructor(data: AltElementData) {
+    constructor(client: AltUnityClient, data: AltElementData) {
+        this.client = client
         this.data = data
     }
 
@@ -37,6 +42,26 @@ export default class AltElement {
     get idCamera() { return this.data.idCamera }
     get transformParentId() { return this.data.transformParentId }
     get transformId() { return this.data.transformId }
+
+    toJSON() {
+        return JSON.stringify(this.data)
+    }
+
+    async getText() {
+        return await this.client.getElementText(this)
+    }
+
+    async getComponents() {
+        return await this.client.getElementComponents(this)
+    }
+
+    async tap(args: AltTapArgs = {}) {
+        return await this.client.tapElement(this, args)
+    }
+
+    async click(args: AltTapArgs = {}) {
+        return await this.client.clickElement(this, args)
+    }
 }
 
 export { AltElement, AltElementData }

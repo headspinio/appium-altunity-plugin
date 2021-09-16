@@ -6,6 +6,7 @@ import {
     findObject,
     findObjects,
     findAllObjects,
+    getCurrentScene,
     getScreenshotAsB64,
     getScreenshotAsPNG,
     keyDown,
@@ -13,6 +14,14 @@ import {
     isActionFinished,
     waitTillActionFinished,
     pressKey,
+    tapCoordinates,
+    tapElement,
+    clickElement,
+    getElementText,
+    getElementComponents,
+    getComponentProperty,
+    getComponentFields,
+    Position,
 } from './commands'
 import { AltBy } from './by'
 import { AltKeyCode } from './key-code'
@@ -58,19 +67,35 @@ export default class AltUnityClient {
     protected responseBuffer: string
     protected responseFinished: Deferred<AltUnityResponse> | null
 
-    // commands
+    // general commands
     protected closeConnection = closeConnection
-    public getServerVersion = getServerVersion
-    public findObject = findObject
-    public findObjects = findObjects
-    public findAllObjects = findAllObjects
-    public getScreenshotAsPNG = getScreenshotAsPNG
-    public getScreenshotAsB64 = getScreenshotAsB64
-    public keyDown = keyDown
-    public keyUp = keyUp
-    public pressKey = pressKey
-    public isActionFinished = isActionFinished
-    public waitTillActionFinished = waitTillActionFinished
+    getServerVersion = getServerVersion
+    getScreenshotAsPNG = getScreenshotAsPNG
+    getScreenshotAsB64 = getScreenshotAsB64
+
+    // find commands
+    findObject = findObject
+    findObjects = findObjects
+    findAllObjects = findAllObjects
+    getCurrentScene = getCurrentScene
+
+    // action commands
+    keyDown = keyDown
+    keyUp = keyUp
+    pressKey = pressKey
+    isActionFinished = isActionFinished
+    waitTillActionFinished = waitTillActionFinished
+    tapCoordinates = tapCoordinates
+    tapElement = tapElement
+    clickElement = clickElement
+
+    // element commands
+    getElementText = getElementText
+    getElementComponents = getElementComponents
+
+    // component commands
+    getComponentProperty = getComponentProperty
+    getComponentFields = getComponentFields
 
     constructor(opts: ClientOpts) {
         if (!opts.host) {
@@ -115,11 +140,12 @@ export default class AltUnityClient {
     }
 
     onData(data: string) {
+        this.log?.debug(`Received ${data.length} bytes: ${data}`);
         if (this.curMsgId === null || this.responseFinished === null) {
+            this.log?.error('This data was unexpected, will throw')
             throw new Error('Received data when we were expecting none')
         }
         try {
-            this.log?.debug(`Received ${data.length} bytes: ${data}`);
             if (data.includes(ResponseEncoding.END)) {
                 this.finishReceivingResponse(data)
                 return
@@ -141,7 +167,7 @@ export default class AltUnityClient {
             this.log?.debug(`Sending command ${this.curMsgId}: ${reqStr}`);
             await this.send(reqStr)
             let res = await this.waitForResponse()
-            if (multipart && res.data === 'Ok') {
+            if (multipart) {
                 // if we're doing screenshot or something else that sends an initial response then
                 // a second one without another command in the middle, just receive data again
                 res = await this.waitForResponse()
@@ -221,6 +247,7 @@ export {
     AltBy,
     AltElement,
     AltKeyCode,
+    Position,
     DEFAULT_ALTUNITY_HOST,
     DEFAULT_ALTUNITY_PORT,
 }

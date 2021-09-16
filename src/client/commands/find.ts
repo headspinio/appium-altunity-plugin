@@ -9,7 +9,7 @@ export type FindParams = {
     enabled?: boolean
 }
 
-export async function findObjects(this: AltUnityClient, params: FindParams) {
+export async function findObjects(this: AltUnityClient, params: FindParams): Promise<AltElement[]> {
     const selectorPath = getPath(params.by, params.selector)
     const camera = getPath(this.cameraBy, this.cameraPath)
     const res = await this.sendCommand('findObjects', [
@@ -18,14 +18,14 @@ export async function findObjects(this: AltUnityClient, params: FindParams) {
         camera,
         (params.enabled ?? true).toString()
     ])
-    return JSON.parse(res).map((data: {}) => new AltElement(data as AltElementData))
+    return JSON.parse(res).map((data: {}) => new AltElement(this, data as AltElementData))
 }
 
 export async function findAllObjects(this: AltUnityClient, enabled: boolean = true) {
     return await this.findObjects({by: AltBy.PATH, selector: '//*', enabled})
 }
 
-export async function findObject(this: AltUnityClient, params: FindParams) {
+export async function findObject(this: AltUnityClient, params: FindParams): Promise<AltElement> {
     const enabled = params.enabled ?? true
     let command = 'findObject'
     let path = getPath(params.by, params.selector)
@@ -39,5 +39,10 @@ export async function findObject(this: AltUnityClient, params: FindParams) {
         getPath(this.cameraBy, this.cameraPath),
         enabled.toString()
     ])
-    return new AltElement(JSON.parse(res) as AltElementData)
+    return new AltElement(this, JSON.parse(res) as AltElementData)
+}
+
+export async function getCurrentScene(this: AltUnityClient): Promise<AltElement> {
+    const res = await this.sendCommand('getCurrentScene')
+    return new AltElement(this, JSON.parse(res) as AltElementData)
 }
