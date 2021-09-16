@@ -1,7 +1,7 @@
 import BasePlugin from '@appium/base-plugin'
-import type { BaseDriver } from '@appium/base-plugin';
+import type { BaseDriver } from '@appium/base-driver';
 import type { NextHandler } from './types'
-import AltUnityClient from './client';
+import AltUnityClient, { AltBy, AltElement } from './client';
 
 class AltUnityPlugin extends BasePlugin {
 
@@ -27,4 +27,6 @@ class AltUnityPlugin extends BasePlugin {
 export {
     AltUnityPlugin,
     AltUnityClient,
+    AltBy,
+    AltElement,
 }

@@ -1,9 +1,14 @@
 import net from 'net'
-import { Deferred } from './utils'
+import { Deferred } from '../utils'
 import {
     closeConnection,
-    getServerVersion
+    getServerVersion,
+    findObject,
+    findObjects,
+    findAllObjects,
 } from './commands'
+import { AltBy } from './by'
+import { AltElement } from './alt-element'
 
 const DEFAULT_ALTUNITY_HOST = '127.0.0.1'
 const DEFAULT_ALTUNITY_PORT = 13000
@@ -36,6 +41,8 @@ export default class AltUnityClient {
     public host: string
     public port: number
     public serverVersion?: string
+    public cameraBy: AltBy
+    public cameraPath: string
 
     protected sock: net.Socket | null
     protected curMsgId: number | null
@@ -44,8 +51,11 @@ export default class AltUnityClient {
     protected responseFinished: Deferred<AltUnityResponse> | null
 
     // commands
-    public getServerVersion = getServerVersion
     protected closeConnection = closeConnection
+    public getServerVersion = getServerVersion
+    public findObject = findObject
+    public findObjects = findObjects
+    public findAllObjects = findAllObjects
 
     constructor(opts: ClientOpts) {
         if (!opts.host) {
@@ -61,6 +71,8 @@ export default class AltUnityClient {
         this.responseBuffer = ''
         this.responseFinished = null
         this.log = opts.log
+        this.cameraBy = AltBy.NAME
+        this.cameraPath = '' // default camera path is empty
     }
 
     async connect() {
@@ -121,7 +133,7 @@ export default class AltUnityClient {
         return res.data
     }
 
-    async handleCommandErrors(data: string) {
+    handleCommandErrors(data: string) {
         // TODO can make nice error classes later
         if (data.startsWith('error:')) {
             throw new Error(data)
@@ -140,16 +152,19 @@ export default class AltUnityClient {
     }
 
     finishReceivingResponse(lastChunk: string) {
-        const fullResponse = this.responseBuffer + lastChunk
-        const parsedResponse = this.parseResponse(fullResponse)
-        this.responseBuffer = ''
-        this.curMsgId = null
-        if (this.responseFinished === null) {
-            throw new Error('Something went wrong, went to fulfill response finished but it didnt exist')
+        try {
+            const fullResponse = this.responseBuffer + lastChunk
+            const parsedResponse = this.parseResponse(fullResponse)
+            if (this.responseFinished === null) {
+                throw new Error('Something went wrong, went to fulfill response finished but it didnt exist')
+            }
+            this.log?.debug('Finished receiving response:')
+            this.log?.debug(parsedResponse)
+            this.responseFinished?.resolve(parsedResponse)
+        } finally {
+            this.responseBuffer = ''
+            this.curMsgId = null
         }
-        this.log?.debug('Finished receiving response:')
-        this.log?.debug(parsedResponse)
-        this.responseFinished?.resolve(parsedResponse)
     }
 
     parseResponse(data: string) {
@@ -175,6 +190,8 @@ export default class AltUnityClient {
 
 export {
     AltUnityClient,
+    AltBy,
+    AltElement,
     DEFAULT_ALTUNITY_HOST,
     DEFAULT_ALTUNITY_PORT,
 }
