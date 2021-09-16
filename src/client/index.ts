@@ -6,6 +6,8 @@ import {
     findObject,
     findObjects,
     findAllObjects,
+    getScreenshotAsB64,
+    getScreenshotAsPNG,
 } from './commands'
 import { AltBy } from './by'
 import { AltElement } from './alt-element'
@@ -56,6 +58,8 @@ export default class AltUnityClient {
     public findObject = findObject
     public findObjects = findObjects
     public findAllObjects = findAllObjects
+    public getScreenshotAsPNG = getScreenshotAsPNG
+    public getScreenshotAsB64 = getScreenshotAsB64
 
     constructor(opts: ClientOpts) {
         if (!opts.host) {
@@ -115,22 +119,36 @@ export default class AltUnityClient {
         }
     }
 
-    async sendCommand(cmdName: string, args: string[] = []) {
+    async sendCommand(cmdName: string, args: string[] = [], multipart: boolean = false) {
         if (this.curMsgId !== null) {
             throw new Error(`Tried to send a new command while command ${this.curMsgId} was in progress`)
         }
-        this.curMsgId = Date.now()
-        const reqStr = [this.curMsgId, cmdName, ...args].join(RequestEncoding.SEPARATOR) +
-                       RequestEncoding.END
-        this.log?.debug(`Sending command ${this.curMsgId}: ${reqStr}`);
-        await this.send(reqStr)
+        try {
+            this.curMsgId = Date.now()
+            const reqStr = [this.curMsgId, cmdName, ...args].join(RequestEncoding.SEPARATOR) +
+                           RequestEncoding.END
+            this.log?.debug(`Sending command ${this.curMsgId}: ${reqStr}`);
+            await this.send(reqStr)
+            let res = await this.waitForResponse()
+            if (multipart && res.data === 'Ok') {
+                // if we're doing screenshot or something else that sends an initial response then
+                // a second one without another command in the middle, just receive data again
+                res = await this.waitForResponse()
+            }
+            return res.data
+        } finally {
+            this.curMsgId = null
+        }
+    }
+
+    async waitForResponse() {
         this.responseFinished = new Deferred()
         const res = await this.responseFinished
         this.handleCommandErrors(res.data)
         if (res.log) {
             this.log?.debug(res.log)
         }
-        return res.data
+        return res
     }
 
     handleCommandErrors(data: string) {
@@ -163,7 +181,6 @@ export default class AltUnityClient {
             this.responseFinished?.resolve(parsedResponse)
         } finally {
             this.responseBuffer = ''
-            this.curMsgId = null
         }
     }
 

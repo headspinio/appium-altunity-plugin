@@ -23,6 +23,13 @@ test('find all objects', async () => {
 test('find one object', async () => {
     const obj = await client.findObject({by: AltBy.NAME, selector: 'Player'})
     expect(obj).toBeInstanceOf(AltElement)
-    expect(obj.data).toHaveProperty('id')
-    console.log(obj.data)
+    expect(obj.name).toEqual('Player')
+})
+
+test('get screenshot', async () => {
+    const b64 = await client.getScreenshotAsB64()
+    expect(b64).toMatch(/^iVBOR/)
+    const binary = await client.getScreenshotAsPNG()
+    expect(binary).toBeInstanceOf(Buffer)
+    expect(binary.length).toBeGreaterThan(1000)
 })

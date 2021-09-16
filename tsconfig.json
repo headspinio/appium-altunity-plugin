@@ -6,7 +6,10 @@
         "inlineSourceMap": true,
         "allowJs": false,
         "declaration": true,
-        "esModuleInterop": true
+        "esModuleInterop": true,
+        "moduleResolution": "Node",
+        "module": "CommonJS",
+        "target": "ES2015"
     },
     "watchOptions": {
         "excludeDirectories": ["**/node_modules", "build"]

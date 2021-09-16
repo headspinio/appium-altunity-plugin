@@ -1,7 +1,7 @@
 import { AltUnityClient } from '..'
 import { AltBy } from '../by'
 import { getPath } from './command-helpers'
-import AltElement from '../alt-element'
+import AltElement, { AltElementData } from '../alt-element'
 
 export type FindParams = {
     by: AltBy,
@@ -18,7 +18,7 @@ export async function findObjects(this: AltUnityClient, params: FindParams) {
         camera,
         (params.enabled ?? true).toString()
     ])
-    return JSON.parse(res).map((data: {}) => new AltElement(data))
+    return JSON.parse(res).map((data: {}) => new AltElement(data as AltElementData))
 }
 
 export async function findAllObjects(this: AltUnityClient, enabled: boolean = true) {
@@ -39,5 +39,5 @@ export async function findObject(this: AltUnityClient, params: FindParams) {
         getPath(this.cameraBy, this.cameraPath),
         enabled.toString()
     ])
-    return new AltElement(JSON.parse(res))
+    return new AltElement(JSON.parse(res) as AltElementData)
 }
