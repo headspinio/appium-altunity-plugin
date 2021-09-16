@@ -8,8 +8,14 @@ import {
     findAllObjects,
     getScreenshotAsB64,
     getScreenshotAsPNG,
+    keyDown,
+    keyUp,
+    isActionFinished,
+    waitTillActionFinished,
+    pressKey,
 } from './commands'
 import { AltBy } from './by'
+import { AltKeyCode } from './key-code'
 import { AltElement } from './alt-element'
 
 const DEFAULT_ALTUNITY_HOST = '127.0.0.1'
@@ -60,6 +66,11 @@ export default class AltUnityClient {
     public findAllObjects = findAllObjects
     public getScreenshotAsPNG = getScreenshotAsPNG
     public getScreenshotAsB64 = getScreenshotAsB64
+    public keyDown = keyDown
+    public keyUp = keyUp
+    public pressKey = pressKey
+    public isActionFinished = isActionFinished
+    public waitTillActionFinished = waitTillActionFinished
 
     constructor(opts: ClientOpts) {
         if (!opts.host) {
@@ -209,6 +220,7 @@ export {
     AltUnityClient,
     AltBy,
     AltElement,
+    AltKeyCode,
     DEFAULT_ALTUNITY_HOST,
     DEFAULT_ALTUNITY_PORT,
 }

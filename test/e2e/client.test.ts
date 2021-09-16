@@ -1,5 +1,6 @@
 // TODO test currently assumes the TestGame.app running on mac separately
-import { AltUnityClient, AltBy, AltElement } from '../../src'
+import { AltUnityClient, AltBy, AltElement, AltKeyCode } from '../../src'
+import B from 'bluebird'
 
 const client = new AltUnityClient({/*log: console*/})
 
@@ -32,4 +33,24 @@ test('get screenshot', async () => {
     const binary = await client.getScreenshotAsPNG()
     expect(binary).toBeInstanceOf(Buffer)
     expect(binary.length).toBeGreaterThan(1000)
+})
+
+test('press key down and up', async () => {
+    let player = await client.findObject({by: AltBy.NAME, selector: 'Player'})
+    const x1 = player.x
+    await client.keyDown(AltKeyCode.RightArrow)
+    await B.delay(500)
+    await client.keyUp(AltKeyCode.RightArrow)
+    player = await client.findObject({by: AltBy.NAME, selector: 'Player'})
+    const x2 = player.x
+    expect(x2).toBeGreaterThan(x1)
+})
+
+test('press key for duration', async () => {
+    let player = await client.findObject({by: AltBy.NAME, selector: 'Player'})
+    const x1 = player.x
+    await client.pressKey(AltKeyCode.RightArrow, 500)
+    player = await client.findObject({by: AltBy.NAME, selector: 'Player'})
+    const x2 = player.x
+    expect(x2).toBeGreaterThan(x1)
 })
