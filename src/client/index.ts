@@ -122,12 +122,19 @@ export default class AltUnityClient {
                     {host: this.host, port: this.port},
                     resolve
                 )
+                this.sock.on('error', reject)
                 this.sock.setEncoding('utf8')
-                this.sock.on('data', (data: string) => this.onData(data))
+                this.sock.on('end', () => {
+                    this.log.info('Server disconnected, removing socket')
+                    this.sock = null
+                })
             } catch (err) {
                 reject(err)
             }
         })
+        if (this.sock) {
+            this.sock.on('data', (data: string) => this.onData(data))
+        }
     }
 
     async disconnect() {

@@ -47,6 +47,10 @@ export default class AltElement {
         return JSON.stringify(this.data)
     }
 
+    toXMLNode() {
+        return `<${this.name} id="${this.id}" x="${this.x}" y="${this.y}", type="${this.type}" />`
+    }
+
     async getText() {
         return await this.client.getElementText(this)
     }
