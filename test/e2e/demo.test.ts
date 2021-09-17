@@ -14,7 +14,7 @@ afterAll(async () => {
 })
 
 test('should run and catch tokens while avoiding enemies', async () => {
-    await game.playerRun(900)
+    await game.playerRun(1000)
     expect(await game.getNumTokensNearPlayer()).toBe(1)
     expect(await game.getNumEnemiesNearPlayer()).toBe(1)
     await game.playerRunWithJumps(1400, [{startMs: 500, durationMs: 700}])
