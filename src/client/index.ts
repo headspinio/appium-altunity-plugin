@@ -1,7 +1,5 @@
-import net from 'net'
 import { Deferred } from '../utils'
 import {
-    closeConnection,
     getServerVersion,
     findObject,
     findObjects,
@@ -20,15 +18,17 @@ import {
     getElementText,
     getElementComponents,
     getComponentProperty,
-    getComponentFields,
     Position,
 } from './commands'
 import { AltBy } from './by'
 import { AltKeyCode } from './key-code'
 import { AltElement } from './alt-element'
+import { Connection, CommandParameters } from './connection'
 
 const DEFAULT_ALTUNITY_HOST = '127.0.0.1'
 const DEFAULT_ALTUNITY_PORT = 13000
+
+export const DEFAULT_VALIDATION_STR = 'Ok'
 
 enum ResponseEncoding {
     START = 'altstart::',
@@ -50,7 +50,18 @@ type AltUnityResponse = {
 type ClientOpts = {
     host?: string
     port?: number
-    log?: any
+    log: any
+}
+
+export class AltUnityError extends Error {
+    type: string
+    trace: string
+
+    constructor(type: string, message: string, trace: string) {
+        super(message)
+        this.type = type
+        this.trace = trace
+    }
 }
 
 export default class AltUnityClient {
@@ -61,14 +72,11 @@ export default class AltUnityClient {
     public cameraBy: AltBy
     public cameraPath: string
 
-    protected sock: net.Socket | null
+    protected conn: Connection
     protected curMsgId: number | null
     protected log?: any
-    protected responseBuffer: string
-    protected responseFinished: Deferred<AltUnityResponse> | null
 
     // general commands
-    protected closeConnection = closeConnection
     getServerVersion = getServerVersion
     getScreenshotAsPNG = getScreenshotAsPNG
     getScreenshotAsB64 = getScreenshotAsB64
@@ -95,7 +103,6 @@ export default class AltUnityClient {
 
     // component commands
     getComponentProperty = getComponentProperty
-    getComponentFields = getComponentFields
 
     constructor(opts: ClientOpts) {
         if (!opts.host) {
@@ -106,145 +113,57 @@ export default class AltUnityClient {
         }
         this.host = opts.host
         this.port = opts.port
-        this.sock = null
+        this.conn = new Connection({
+            log: opts.log,
+            port: opts.port,
+            host: opts.host
+        })
         this.curMsgId = null
-        this.responseBuffer = ''
-        this.responseFinished = null
         this.log = opts.log
         this.cameraBy = AltBy.NAME
         this.cameraPath = '' // default camera path is empty
     }
 
     async connect() {
-        await new Promise<void>((resolve, reject) => {
-            try {
-                this.sock = net.createConnection(
-                    {host: this.host, port: this.port},
-                    resolve
-                )
-                this.sock.on('error', reject)
-                this.sock.setEncoding('utf8')
-                this.sock.on('end', () => {
-                    this.log.info('Server disconnected, removing socket')
-                    this.sock = null
-                })
-            } catch (err) {
-                reject(err)
-            }
-        })
-        if (this.sock) {
-            this.sock.on('data', (data: string) => this.onData(data))
-        }
+        this.log.info(`Attempting to connect to AltUnity server`)
+        await this.conn.connect()
+        this.log.info(`Connection to AltUnity server established`)
     }
 
     async disconnect() {
-        this.closeConnection()
-        this.sock?.destroy()
-        this.sock = null
+        await this.conn.close()
         this.curMsgId = null
-        this.responseBuffer = ''
-        this.responseFinished = null
     }
 
-    onData(data: string) {
-        this.log?.debug(`Received ${data.length} bytes: ${data}`);
-        if (this.curMsgId === null || this.responseFinished === null) {
-            this.log?.error('This data was unexpected, will throw')
-            throw new Error('Received data when we were expecting none')
-        }
-        try {
-            if (data.includes(ResponseEncoding.END)) {
-                this.finishReceivingResponse(data)
-                return
-            }
-            this.responseBuffer += data
-        } catch (err: any) {
-            this.responseFinished.reject(err)
-        }
-    }
-
-    async sendCommand(cmdName: string, args: string[] = [], multipart: boolean = false) {
+    async _sendCommand(commandName: string, data?: CommandParameters, responseCount: number = 1, validations: string[] = []) {
         if (this.curMsgId !== null) {
             throw new Error(`Tried to send a new command while command ${this.curMsgId} was in progress`)
         }
         try {
             this.curMsgId = Date.now()
-            const reqStr = [this.curMsgId, cmdName, ...args].join(RequestEncoding.SEPARATOR) +
-                           RequestEncoding.END
-            this.log?.debug(`Sending command ${this.curMsgId}: ${reqStr}`);
-            await this.send(reqStr)
-            let res = await this.waitForResponse()
-            if (multipart) {
-                // if we're doing screenshot or something else that sends an initial response then
-                // a second one without another command in the middle, just receive data again
-                res = await this.waitForResponse()
+            const message = {...data, commandName, messageId: this.curMsgId.toString()}
+            const responses = await this.conn.sendMessage(message, responseCount, validations)
+
+            for (const res of responses) {
+                if (res.error) {
+                    throw new AltUnityError(res.error.type, res.error.message, res.error.trace)
+                }
             }
-            return res.data
+
+            return responses.map((r) => r.data)
         } finally {
             this.curMsgId = null
         }
     }
 
-    async waitForResponse() {
-        this.responseFinished = new Deferred()
-        const res = await this.responseFinished
-        this.handleCommandErrors(res.data)
-        if (res.log) {
-            this.log?.debug(res.log)
-        }
-        return res
+    async sendSimpleCommand(commandName: string, data?: CommandParameters) {
+        const datas = await this._sendCommand(commandName, data, 1)
+        return datas[0]
     }
 
-    handleCommandErrors(data: string) {
-        // TODO can make nice error classes later
-        if (data.startsWith('error:')) {
-            throw new Error(data)
-        }
-    }
-
-    async send(data: string) {
-        return await new Promise<void>((resolve, reject) => {
-            this.sock?.write(data, (err) => {
-                if (err) {
-                    return reject(err)
-                }
-                resolve()
-            })
-        })
-    }
-
-    finishReceivingResponse(lastChunk: string) {
-        try {
-            const fullResponse = this.responseBuffer + lastChunk
-            const parsedResponse = this.parseResponse(fullResponse)
-            if (this.responseFinished === null) {
-                throw new Error('Something went wrong, went to fulfill response finished but it didnt exist')
-            }
-            this.log?.debug('Finished receiving response:')
-            this.log?.debug(parsedResponse)
-            this.responseFinished?.resolve(parsedResponse)
-        } finally {
-            this.responseBuffer = ''
-        }
-    }
-
-    parseResponse(data: string) {
-        const partSplitter = new RegExp(
-            `${ResponseEncoding.START}|${ResponseEncoding.RESPONSE}|` +
-            `${ResponseEncoding.LOG}|${ResponseEncoding.END}`
-        )
-        const parts = data.split(partSplitter)
-        if (parts.length !== 5 || parts[0] || parts[4]) {
-            throw new Error(`Response was not in correct encoding. It was: ${data}`)
-        }
-        if (parts[1] !== this.curMsgId?.toString()) {
-            throw new Error(`Got a response for message ${parts[1]} but expecting a response to ` +
-                            `message ${this.curMsgId}`)
-        }
-        return {
-            data: parts[2],
-            log: parts[3]
-        }
+    async sendTwoPartCommand(commandName: string, data?: CommandParameters, validations: string[] = [DEFAULT_VALIDATION_STR]) {
+        const datas = await this._sendCommand(commandName, data, 2, validations)
+        return datas[1]
     }
 
 }

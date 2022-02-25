@@ -31,10 +31,6 @@ class AltComponent {
         return await this.client.getComponentProperty(this.element, this, property, assemblyName,
                                                       maxDepth)
     }
-
-    async getFields() {
-        return await this.client.getComponentFields(this.element, this)
-    }
 }
 
 export default AltComponent

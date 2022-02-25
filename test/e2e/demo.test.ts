@@ -1,8 +1,9 @@
 // TODO test currently assumes the TestGame.app running on mac separately
 import { AltUnityClient } from '../../src'
 import GameModel, { Direction } from './game-model'
+import { emptyLogger } from '../helpers'
 
-const client = new AltUnityClient({/*log: console*/})
+const client = new AltUnityClient({log: emptyLogger})
 const game = new GameModel(client)
 
 beforeAll(async () => {

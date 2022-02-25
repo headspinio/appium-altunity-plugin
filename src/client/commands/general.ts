@@ -1,15 +1,11 @@
 import AltUnityClient from '..';
 
 export async function getServerVersion(this: AltUnityClient) {
-    return await this.sendCommand('getServerVersion')
-}
-
-export async function closeConnection(this: AltUnityClient) {
-    await this.sendCommand('closeConnection')
+    return await this.sendSimpleCommand('getServerVersion')
 }
 
 export async function getScreenshotAsB64(this: AltUnityClient): Promise<string> {
-    return await this.sendCommand('getPNGScreenshot', [], true)
+    return await this.sendTwoPartCommand('getPNGScreenshot')
 }
 
 export async function getScreenshotAsPNG(this: AltUnityClient): Promise<Buffer> {

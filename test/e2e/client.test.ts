@@ -1,8 +1,10 @@
 // TODO test currently assumes the TestGame.app running on mac separately
 import { AltUnityClient, AltBy, AltElement, AltKeyCode } from '../../src'
+import { emptyLogger } from '../helpers'
 import B from 'bluebird'
 
-const client = new AltUnityClient({/*log: console*/})
+const log = emptyLogger
+const client = new AltUnityClient({log})
 
 beforeAll(async () => {
     await client.connect()
@@ -94,7 +96,7 @@ test('tap element', async () => {
         const els = await client.findObjects({by: AltBy.PATH, selector: '//Button/Text'})
         for (const el of els) {
             if (await el.getText() === 'Settings') {
-                await el.tap()
+                await el.tapViaCoords()
                 break
             }
         }

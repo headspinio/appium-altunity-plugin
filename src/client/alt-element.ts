@@ -16,7 +16,6 @@ type AltElementData = {
     idCamera: number
     transformParentId: number
     transformId: number
-    parentId?: number
 }
 
 export default class AltElement {
@@ -43,6 +42,10 @@ export default class AltElement {
     get transformParentId() { return this.data.transformParentId }
     get transformId() { return this.data.transformId }
 
+    asUnityObject() {
+        return this.data
+    }
+
     toJSON() {
         return JSON.stringify(this.data)
     }
@@ -61,6 +64,10 @@ export default class AltElement {
 
     async tap(args: AltTapArgs = {}) {
         return await this.client.tapElement(this, args)
+    }
+
+    async tapViaCoords() {
+        return await this.client.tapCoordinates({pos: {x: this.x, y: this.y}})
     }
 
     async click(args: AltTapArgs = {}) {

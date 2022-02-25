@@ -27,7 +27,7 @@ class AltUnityPlugin extends BasePlugin {
 
     constructor(name: string) {
         super(name)
-        this.client = new AltUnityClient({})
+        this.client = new AltUnityClient({log})
         this.isInUnityContext = false
     }
 

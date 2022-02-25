@@ -10,15 +10,16 @@ export type FindParams = {
 }
 
 export async function findObjects(this: AltUnityClient, params: FindParams): Promise<AltElement[]> {
-    const selectorPath = getPath(params.by, params.selector)
-    const camera = getPath(this.cameraBy, this.cameraPath)
-    const res = await this.sendCommand('findObjects', [
-        selectorPath,
-        this.cameraBy,
-        camera,
-        (params.enabled ?? true).toString()
-    ])
-    return JSON.parse(res).map((data: {}) => new AltElement(this, data as AltElementData))
+    const path = getPath(params.by, params.selector)
+    const cameraPath = getPath(this.cameraBy, this.cameraPath)
+    const res = await this.sendSimpleCommand('findObjects', {
+        by: params.by,
+        path,
+        cameraBy: this.cameraBy,
+        cameraPath,
+        enabled: params.enabled,
+    })
+    return res.map((data: {}) => new AltElement(this, data as AltElementData))
 }
 
 export async function findAllObjects(this: AltUnityClient, enabled: boolean = true) {
@@ -27,22 +28,18 @@ export async function findAllObjects(this: AltUnityClient, enabled: boolean = tr
 
 export async function findObject(this: AltUnityClient, params: FindParams): Promise<AltElement> {
     const enabled = params.enabled ?? true
-    let command = 'findObject'
     let path = getPath(params.by, params.selector)
-    if (params.by === AltBy.NAME && enabled) {
-        command = 'findActiveObjectByName'
-        path = params.selector
-    }
-    const res = await this.sendCommand(command, [
+    const res = await this.sendSimpleCommand('findObject', {
+        by: params.by,
         path,
-        this.cameraBy,
-        getPath(this.cameraBy, this.cameraPath),
-        enabled.toString()
-    ])
-    return new AltElement(this, JSON.parse(res) as AltElementData)
+        cameraBy: this.cameraBy,
+        cameraPath: getPath(this.cameraBy, this.cameraPath),
+        enabled,
+    })
+    return new AltElement(this, res as AltElementData)
 }
 
 export async function getCurrentScene(this: AltUnityClient): Promise<AltElement> {
-    const res = await this.sendCommand('getCurrentScene')
-    return new AltElement(this, JSON.parse(res) as AltElementData)
+    const res = await this.sendSimpleCommand('getCurrentScene')
+    return new AltElement(this, res as AltElementData)
 }
