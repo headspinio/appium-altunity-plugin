@@ -75,7 +75,6 @@ export default class AltUnityClient {
     public cameraPath: string
 
     protected conn: Connection
-    protected curMsgId: number | null
     protected log?: any
 
     // general commands
@@ -122,7 +121,6 @@ export default class AltUnityClient {
             port: opts.port,
             host: opts.host
         })
-        this.curMsgId = null
         this.log = opts.log
         this.cameraBy = AltBy.NAME
         this.cameraPath = '' // default camera path is empty
@@ -145,28 +143,20 @@ export default class AltUnityClient {
 
     async disconnect() {
         await this.conn.close()
-        this.curMsgId = null
     }
 
     async _sendCommand(commandName: string, data?: CommandParameters, responseCount: number = 1, validations: string[] = []) {
-        if (this.curMsgId !== null) {
-            throw new Error(`Tried to send a new command while command ${this.curMsgId} was in progress`)
-        }
-        try {
-            this.curMsgId = Date.now()
-            const message = {...data, commandName, messageId: this.curMsgId.toString()}
-            const responses = await this.conn.sendMessage(message, responseCount, validations)
+        const curMsgId = Date.now()
+        const message = {...data, commandName, messageId: curMsgId.toString()}
+        const responses = await this.conn.sendMessage(message, responseCount, validations)
 
-            for (const res of responses) {
-                if (res.error) {
-                    throw new AltUnityError(res.error.type, res.error.message, res.error.trace)
-                }
+        for (const res of responses) {
+            if (res.error) {
+                throw new AltUnityError(res.error.type, res.error.message, res.error.trace)
             }
-
-            return responses.map((r) => r.data)
-        } finally {
-            this.curMsgId = null
         }
+
+        return responses.map((r) => r.data)
     }
 
     async sendSimpleCommand(commandName: string, data?: CommandParameters) {

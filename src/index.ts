@@ -19,6 +19,9 @@ import {
     findElements,
     _find,
     _findWithAltBy,
+    performActions,
+    _performKeyActions,
+    _performPointerActions,
 } from './commands'
 
 const EXTRA_CAPS = {
@@ -64,6 +67,9 @@ class AltUnityPlugin extends BasePlugin {
     findElements = findElements
     _find = _find
     _findWithAltBy = _findWithAltBy
+    performActions = performActions
+    _performKeyActions = _performKeyActions
+    _performPointerActions = _performPointerActions
 
     constructor(name: string) {
         super(name)

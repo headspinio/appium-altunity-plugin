@@ -1,6 +1,6 @@
 import type { RemoteOptions, Browser } from 'webdriverio'
-import { remote } from 'webdriverio'
-import { UNITY_CONTEXT } from '../../src'
+import { remote, Element } from 'webdriverio'
+import { AltKeyCode, UNITY_CONTEXT } from '../../src'
 import type { ElementReference } from '@wdio/protocols'
 
 // assuming an Appium 2.x server with the UiAutomator2 driver installed and this plugin linked in
@@ -25,6 +25,7 @@ const WDIO_PARAMS: RemoteOptions = {
     logLevel: 'silent',
     capabilities
 }
+const PLAYER_ID = 'SuperPlayer'
 
 let driver: Browser<'async'>
 
@@ -51,7 +52,6 @@ test('get page source', async () => {
 
 describe('find and interact with elements', () => {
     let player: any
-    const playerId = 'SuperPlayer'
 
     beforeAll(async () => {
         const context = await driver.getContext()
@@ -80,18 +80,45 @@ describe('find and interact with elements', () => {
     })
 
     test('find by id', async () => {
-        player = await findAndValidate('id', playerId)
+        player = await findAndValidate('id', PLAYER_ID)
         expect(await player.getAttribute('name')).toEqual('Player')
     })
 
     test('find by css selector', async () => {
-        player = await findAndValidate('css selector', `#${playerId}`)
+        player = await findAndValidate('css selector', `#${PLAYER_ID}`)
         expect(await player.getAttribute('name')).toEqual('Player')
     })
 
     test('find by tag name', async () => {
         player = await findAndValidate('tag name', 'Player')
         expect(await player.getAttribute('name')).toEqual('Player')
+    })
+
+})
+
+describe('key actions', () => {
+    const pressRight = {
+        type: 'key',
+        id: 'keyboard',
+        actions: [
+            {type: 'keyDown', value: AltKeyCode.RightArrow.toString()},
+            {type: 'pause', duration: 750},
+            {type: 'keyUp', value: AltKeyCode.RightArrow.toString()},
+        ]
+    }
+
+    test('press a key', async () => {
+        let player = await findAndValidate('id', PLAYER_ID)
+        const initX = await player.getAttribute('worldX')
+
+        // open the menu
+        await driver.performActions([pressRight])
+
+        // now assert the menu is open
+        player = await findAndValidate('id', PLAYER_ID)
+        const newX = await player.getAttribute('worldX')
+
+        expect(newX).toBeGreaterThan(initX)
     })
 })
 
