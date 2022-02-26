@@ -4,7 +4,7 @@ const ATTRIBUTE_BASED_BY = [AltBy.ID, AltBy.TAG, AltBy.LAYER, AltBy.COMPONENT, A
 
 export function getPath(by: AltBy, value: string) {
     if (ATTRIBUTE_BASED_BY.includes(by)) {
-        return `//*[@${by.toString().toLowerCase()}="${value}"]`
+        return `//*[@${by.toString().toLowerCase()}=${value}]`
     }
 
     if (by === AltBy.NAME) {
@@ -19,5 +19,5 @@ export function getPathContains(by: AltBy, value: string) {
         return value
     }
 
-    return `//*[contains(@${by.toString().toLowerCase()}, "${value}")]`
+    return `//*[contains(@${by.toString().toLowerCase()}, ${value})]`
 }

@@ -1,7 +1,7 @@
 import type { AltTapArgs } from './commands/actions'
 import { AltUnityClient } from './index'
 
-type AltElementData = {
+export type AltElementData = {
     name: string
     id: number
     x: number
@@ -51,7 +51,7 @@ export default class AltElement {
     }
 
     toXMLNode() {
-        return `<${this.name} id="${this.id}" x="${this.x}" y="${this.y}", type="${this.type}" />`
+        return `<${this.name} id="${this.id}" x="${this.x}" y="${this.y}" type="${this.type}" parentId="${this.transformParentId}" transformId="${this.transformId}" />`
     }
 
     async getText() {
@@ -75,4 +75,4 @@ export default class AltElement {
     }
 }
 
-export { AltElement, AltElementData }
+export { AltElement }

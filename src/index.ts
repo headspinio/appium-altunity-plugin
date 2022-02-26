@@ -2,11 +2,33 @@ import BasePlugin from '@appium/base-plugin'
 import type { BaseDriver } from '@appium/base-driver';
 import type { NextHandler } from './types'
 import AltUnityClient, { AltBy, AltElement, AltKeyCode } from './client';
-import log from './logger'
+import {
+    getPageSource,
+    getContexts,
+    getCurrentContext,
+    setContext,
+    unityElementGuard,
+    click,
+    elementDisplayed,
+    getLocation,
+    getElementRect,
+    getText,
+    getAttribute,
+    UnityElement,
+    findElement,
+    findElements,
+    _find,
+    _findWithAltBy,
+} from './commands'
 
 const EXTRA_CAPS = {
     altUnityHost: {presence: true},
     altUnityPort: {presence: true},
+}
+
+export type Size = {
+    width: number,
+    height: number,
 }
 
 export const UNITY_CONTEXT = 'UNITY'
@@ -24,10 +46,28 @@ class AltUnityPlugin extends BasePlugin {
     client: AltUnityClient
     platform?: Platform
     isInUnityContext: boolean
+    unityElements: {[id: string]: UnityElement} = {}
+    cachedScreenDims?: Size
+
+    getPageSource = getPageSource
+    getCurrentContext = getCurrentContext
+    getContexts = getContexts
+    setContext = setContext
+    unityElementGuard = unityElementGuard
+    click = click
+    elementDisplayed = elementDisplayed
+    getLocation = getLocation
+    getElementRect = getElementRect
+    getText = getText
+    getAttribute = getAttribute
+    findElement = findElement
+    findElements = findElements
+    _find = _find
+    _findWithAltBy = _findWithAltBy
 
     constructor(name: string) {
         super(name)
-        this.client = new AltUnityClient({log})
+        this.client = new AltUnityClient({log: this.logger})
         this.isInUnityContext = false
     }
 
@@ -59,7 +99,7 @@ class AltUnityPlugin extends BasePlugin {
 
         // instantiate our unity client
         const {altUnityHost, altUnityPort} = caps
-        this.client = new AltUnityClient({host: altUnityHost, port: altUnityPort, log})
+        this.client = new AltUnityClient({host: altUnityHost, port: altUnityPort, log: this.logger})
         await this.client.connect()
 
         return [id, caps]
@@ -76,50 +116,21 @@ class AltUnityPlugin extends BasePlugin {
         }
     }
 
-    async getContexts(next: NextHandler) {
-        let existingContexts = []
-        try {
-            existingContexts = await next()
-        } catch (err) {
-            log.info(`Default behavior failed handling getContexts, ignoring`)
-            log.info(`Original error: ${err}`)
-        }
-        return [...existingContexts, UNITY_CONTEXT]
-    }
-
-    async getCurrentContext(next: NextHandler) {
-        if (this.isInUnityContext) {
-            return UNITY_CONTEXT
-        }
-        try {
-            return await next()
-        } catch (err) {
-            log.info(`Default behavior failed handling getContext, ignoring`)
-            log.info(`Original error: ${err}`)
-            return null
-        }
-    }
-
-    async setContext(next: NextHandler, name: string) {
-        if (name !== UNITY_CONTEXT) {
-            this.isInUnityContext = false
-            try {
-                return await next()
-            } catch (err) {
-                log.info(`Default behavior failed handling setContext, ignoring`)
-                log.info(`Original error: ${err}`)
-            }
-        }
-        this.isInUnityContext = true
-    }
-
-    async getPageSource(next: NextHandler) {
+    async unityContextGuard(next: NextHandler, fn: () => Promise<any>) {
         if (!this.isInUnityContext) {
             return await next()
         }
-        const allElements = await this.client.findAllObjects()
-        const xmlElements = allElements.map((e) => e.toXMLNode())
-        return `<Unity>\n\t${xmlElements.join('\n\t')}\n</Unity>`
+        return await fn()
+    }
+
+    async getCachedScreenDims(driver: BaseDriver): Promise<Size> {
+        if (!this.cachedScreenDims) {
+            if (!driver.getWindowSize) {
+                throw new Error(`Tried to get window size from driver but it doesn't support it`)
+            }
+            this.cachedScreenDims = await driver.getWindowSize() as Size
+        }
+        return this.cachedScreenDims
     }
 
     async deleteSession(next: NextHandler) {

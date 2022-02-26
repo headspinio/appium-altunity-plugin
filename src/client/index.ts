@@ -1,9 +1,10 @@
-import { Deferred } from '../utils'
 import {
     getServerVersion,
     findObject,
     findObjects,
     findAllObjects,
+    getCurrentHierarchy,
+    getHierarchy,
     getCurrentScene,
     getScreenshotAsB64,
     getScreenshotAsPNG,
@@ -24,6 +25,7 @@ import { AltBy } from './by'
 import { AltKeyCode } from './key-code'
 import { AltElement } from './alt-element'
 import { Connection, CommandParameters } from './connection'
+import { retryInterval } from 'asyncbox'
 
 const DEFAULT_ALTUNITY_HOST = '127.0.0.1'
 const DEFAULT_ALTUNITY_PORT = 13000
@@ -85,6 +87,8 @@ export default class AltUnityClient {
     findObject = findObject
     findObjects = findObjects
     findAllObjects = findAllObjects
+    getCurrentHierarchy = getCurrentHierarchy
+    getHierarchy = getHierarchy
     getCurrentScene = getCurrentScene
 
     // action commands
@@ -125,8 +129,17 @@ export default class AltUnityClient {
     }
 
     async connect() {
-        this.log.info(`Attempting to connect to AltUnity server`)
-        await this.conn.connect()
+        let numTries = 0
+        const maxTries = 15
+        await retryInterval(maxTries, 1000, async () => {
+            numTries++
+            this.log.info(`Attempting to connect to AltUnity server. This is attempt ${numTries}/${maxTries}`)
+            try {
+                await this.conn.connect()
+            } catch (err: any) {
+                throw new Error(`Could not connect to the AltUnity server. Original error was: ${err.message}`)
+            }
+        })
         this.log.info(`Connection to AltUnity server established`)
     }
 

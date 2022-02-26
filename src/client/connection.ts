@@ -136,10 +136,13 @@ export class Connection {
     async connect() {
         const wsUrl = `ws://${this.host}:${this.port}/altws/`
         this.log.info(`Initiating websocket connection to ${wsUrl}`)
-        this.ws = new WebSocket(wsUrl)
-        await B.promisify(this.ws.on.bind(this.ws))('open')
-        this.ws.on('message', this.handleIncomingMessage.bind(this))
-        this.ws.on('close', this.handleClose.bind(this))
+        return await new Promise((res, rej) => {
+            this.ws = new WebSocket(wsUrl)
+            this.ws.on('message', this.handleIncomingMessage.bind(this))
+            this.ws.on('close', this.handleClose.bind(this))
+            this.ws.on('error', rej)
+            this.ws.on('open', res)
+        })
     }
 
     async handleIncomingMessage(jsonMessage: Buffer) {
