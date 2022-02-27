@@ -24,6 +24,9 @@ import {
     _performPointerActions,
     getUrl,
     setUrl,
+    execute,
+    execute_getTimeScale,
+    execute_setTimeScale,
 } from './commands'
 
 const EXTRA_CAPS = {
@@ -74,6 +77,9 @@ class AltUnityPlugin extends BasePlugin {
     _performPointerActions = _performPointerActions
     getUrl = getUrl
     setUrl = setUrl
+    execute = execute
+    execute_getTimeScale = execute_getTimeScale
+    execute_setTimeScale = execute_setTimeScale
 
     constructor(name: string) {
         super(name)

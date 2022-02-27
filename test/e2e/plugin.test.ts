@@ -133,6 +133,21 @@ describe('key actions', () => {
     })
 })
 
+describe('execute unity methods', () => {
+    test('get the time scale', async () => {
+        expect(await driver.executeScript('unity: getTimeScale', [])).toEqual(1)
+    })
+
+    test('set the time scale', async () => {
+        await driver.executeScript('unity: setTimeScale', [1.5])
+        try {
+            expect(await driver.executeScript('unity: getTimeScale', [])).toEqual(1.5)
+        } finally {
+            await driver.executeScript('unity: setTimeScale', [1])
+        }
+    })
+})
+
 afterAll(async () => {
     if (driver) {
         await driver.deleteSession()

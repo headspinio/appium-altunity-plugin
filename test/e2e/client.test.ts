@@ -66,6 +66,19 @@ test('get current scene', async () => {
     expect(name).toEqual('SampleScene')
 })
 
+test('get the time scale', async () => {
+    expect(await client.getTimeScale()).toEqual(1)
+})
+
+test('set the time scale', async () => {
+    await client.setTimeScale(1.5)
+    try {
+        expect(await client.getTimeScale()).toEqual(1.5)
+    } finally {
+        await client.setTimeScale(1)
+    }
+})
+
 async function withPause<T>(fn: () => Promise<T>): Promise<T> {
     // press escape to get menu up
     await client.pressKey(AltKeyCode.Escape, 500)

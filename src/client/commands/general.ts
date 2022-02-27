@@ -22,3 +22,12 @@ export async function getCurrentScene(this: AltUnityClient): Promise<string> {
 export async function loadScene(this: AltUnityClient, sceneName: string, loadSingle: boolean = true) {
     await this.sendTwoPartCommand('loadScene', {sceneName, loadSingle}, ['Ok', 'Scene Loaded'])
 }
+
+export async function getTimeScale(this: AltUnityClient) {
+    const timeScale = await this.sendSimpleCommand('getTimeScale')
+    return parseFloat(timeScale)
+}
+
+export async function setTimeScale(this: AltUnityClient, timeScale: number) {
+    await this.sendSimpleCommand('setTimeScale', {timeScale: timeScale.toString()})
+}

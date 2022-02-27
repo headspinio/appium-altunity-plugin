@@ -7,6 +7,8 @@ import {
     getHierarchy,
     getCurrentScene,
     loadScene,
+    getTimeScale,
+    setTimeScale,
     getScreenshotAsB64,
     getScreenshotAsPNG,
     keyDown,
@@ -84,6 +86,8 @@ export default class AltUnityClient {
     getScreenshotAsB64 = getScreenshotAsB64
     getCurrentScene = getCurrentScene
     loadScene = loadScene
+    getTimeScale = getTimeScale
+    setTimeScale = setTimeScale
 
     // find commands
     findObject = findObject
