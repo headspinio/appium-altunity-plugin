@@ -22,6 +22,8 @@ import {
     performActions,
     _performKeyActions,
     _performPointerActions,
+    getUrl,
+    setUrl,
 } from './commands'
 
 const EXTRA_CAPS = {
@@ -70,6 +72,8 @@ class AltUnityPlugin extends BasePlugin {
     performActions = performActions
     _performKeyActions = _performKeyActions
     _performPointerActions = _performPointerActions
+    getUrl = getUrl
+    setUrl = setUrl
 
     constructor(name: string) {
         super(name)

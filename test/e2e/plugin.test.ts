@@ -41,13 +41,24 @@ beforeAll(async () => {
     driver = await remote(WDIO_PARAMS)
 })
 
-test('get page source', async () => {
-    const regularSource = await driver.getPageSource()
-    expect(regularSource).toContain('<android.widget')
-    await driver.switchContext(UNITY_CONTEXT)
-    const unitySource = await driver.getPageSource()
-    expect(unitySource).toContain('<Unity>')
-    expect(unitySource).toContain('<Player')
+describe('general', () => {
+
+    test('get page source', async () => {
+        const regularSource = await driver.getPageSource()
+        expect(regularSource).toContain('<android.widget')
+        await driver.switchContext(UNITY_CONTEXT)
+        const unitySource = await driver.getPageSource()
+        expect(unitySource).toContain('<Unity>')
+        expect(unitySource).toContain('<Player')
+    })
+
+    test('load a scene via url', async () => {
+        await driver.navigateTo('unity://SampleScene')
+    })
+
+    test('get the current scene as url', async () => {
+        expect(await driver.getUrl()).toEqual('unity://SampleScene')
+    })
 })
 
 describe('find and interact with elements', () => {

@@ -44,11 +44,6 @@ export async function findObject(this: AltUnityClient, params: FindParams): Prom
     return new AltElement(this, res as AltElementData)
 }
 
-export async function getCurrentScene(this: AltUnityClient): Promise<AltElement> {
-    const res = await this.sendSimpleCommand('getCurrentScene')
-    return new AltElement(this, res as AltElementData)
-}
-
 function buildHierarchyFromElement(element: AltElement, allEls: AltElement[]): HierarchyElement {
     //console.log(`examining element ${element.id} with transformid ${element.transformId} and parent ${element.transformParentId}`)
     // find all the children of this element

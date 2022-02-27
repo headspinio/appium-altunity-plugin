@@ -57,9 +57,13 @@ test('press key for duration', async () => {
     expect(x2).toBeGreaterThan(x1)
 })
 
+test('load a scene', async () => {
+    await client.loadScene('SampleScene')
+})
+
 test('get current scene', async () => {
-    const el = await client.getCurrentScene()
-    expect(el.name).toEqual('SampleScene')
+    const name = await client.getCurrentScene()
+    expect(name).toEqual('SampleScene')
 })
 
 async function withPause<T>(fn: () => Promise<T>): Promise<T> {
