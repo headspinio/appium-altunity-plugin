@@ -112,7 +112,7 @@ describe('key actions', () => {
         type: 'key',
         id: 'keyboard',
         actions: [
-            {type: 'keyDown', value: AltKeyCode.RightArrow.toString()},
+            {type: 'keyDown', value: 'RightArrow'},
             {type: 'pause', duration: 750},
             {type: 'keyUp', value: AltKeyCode.RightArrow.toString()},
         ]

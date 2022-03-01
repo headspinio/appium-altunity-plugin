@@ -39,7 +39,8 @@ function validateKeyActions(actions: Action[])  {
                 throw new InvalidArgumentError(`Each key action must contain a value`)
             }
             const intVal = parseInt(action.value, 10)
-            if (!Object.values(AltKeyCode).includes(intVal)) {
+            if ((intVal >= 0 && !Object.values(AltKeyCode).includes(intVal)) ||
+                !Object.keys(AltKeyCode).includes(action.value)) {
                 throw new InvalidArgumentError(`Received key value '${action.value}' but it could ` +
                                                `not be mapped to a value in the AltKeyCode enum`)
             }
@@ -52,7 +53,12 @@ export async function _performKeyActions(this: AltUnityPlugin, actions: Action[]
     for (const action of actions) {
         console.log(action)
         if ((action.type === KEYDOWN || action.type === KEYUP) && typeof action.value === 'string') {
-            const code = parseInt(action.value, 10)
+            // we either get a string number or a string non-number
+            let code = parseInt(action.value, 10)
+            if (isNaN(code)) {
+                code = AltKeyCode[action.value as keyof typeof AltKeyCode]
+            }
+
             if (action.type === KEYDOWN) {
                 await this.client.keyDown(code)
             } else {
