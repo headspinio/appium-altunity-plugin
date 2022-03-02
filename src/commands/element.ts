@@ -64,7 +64,16 @@ export async function getElementRect(this: AltUnityPlugin, next: NextHandler, _:
 }
 
 export async function getText(this: AltUnityPlugin, next: NextHandler, _: BaseDriver, elId: string) {
-    return await this.unityElementGuard(next, elId, async (el) => await el.element.getText())
+    return await this.unityElementGuard(next, elId, async (el) => {
+        try {
+            return await el.element.getText()
+        } catch (err: any) {
+            if ((err as Error).message.includes('Component TMP_InputField')) {
+                return null
+            }
+            throw err
+        }
+    })
 }
 
 export async function getAttribute(this: AltUnityPlugin, next: NextHandler, _: BaseDriver, attr: keyof AltElementData, elId: string) {

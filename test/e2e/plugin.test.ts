@@ -86,6 +86,20 @@ describe('find and interact with elements', () => {
         expect(location.y).toBeGreaterThan(0)
     })
 
+    test('get element rect', async () => {
+        const {x, y} = await player.getLocation()
+        const {width, height} = await player.getSize()
+        expect(x).toBeGreaterThan(10)
+        expect(y).toBeGreaterThan(10)
+        expect(width).toEqual(0)
+        expect(height).toEqual(0)
+    })
+
+    // TODO get text from an element that actually has text too
+    test('get element text - no text', async () => {
+        expect(await player.getText()).toEqual(null)
+    })
+
     test('find by xpath - multiple', async () => {
         const tokens = await driver.$$('//Token')
         expect(tokens).toHaveLength(100)

@@ -19,11 +19,16 @@ Tester](https://altom.gitlab.io/altunity/altunitytester/).
     * [Get Text](#get-text)
     * [Get Attribute](#get-attribute)
   * [Key Actions](#key-actions)
+  * [Touch Actions](#touch-actions)
   * [Set URL (Load Scene)](#set-url-(load-scene))
   * [Get URL (Get Scene)](#get-url-(get-scene))
   * [Get Time Scale](#get-time-scale)
   * [Set Time Scale](#set-time-scale)
 * [The TypeScript AltUnity Client](#the-typescript-altunity-client)
+* [Contributing](#contributing)
+  * [Developer Setup](#developer-setup)
+  * [Run Tests](#run-tests)
+  * [Make Changes](#make-changes)
 
 ### What is this for?
 
@@ -175,19 +180,117 @@ await element.isDisplayed()
 
 #### Get Rect
 
+Get the coordinates of an element.
+
+- The `width` and `height` values of the response will be set to `0` until I figure out how to
+  retrieve those reliably.
+- The `x` and `y` values represent the center-point of the element (not top-left as is usual)
+
+```js
+const {x, y} = await element.getLocation()
+const {width, height} = await element.getSize()
+```
+
 #### Get Text
+
+Get the text displayed in an element, if it has any, or `null` otherwise.
+
+```js
+const text = await element.getText()
+```
 
 #### Get Attribute
 
+Get an attribute of an element. The only attributes retrievable in this method are the ones that
+you see in the source XML.
+
+```js
+const name = await element.getAttribute('name')
+```
+
 ### Key Actions
+
+You can define keypress sequences using the W3C WebDriver Actions API. With this plugin, key string
+identifiers are taken from [this enum](src/client/key-code.ts). In other words, if you want to
+press the escape key, you will need to use the string `Escape`, or the numeric code defined in the
+enum, `27`.
+
+Here's an example of how to press and release the escape key with a 750ms pause in between:
+
+```js
+await driver.performActions([{
+    type: 'key',
+    id: 'keyboard',
+    actions: [
+        {type: 'keyDown', value: 'Escape'},
+        {type: 'pause', duration: 750},
+        {type: 'keyUp', value: 'Escape'},
+    ]
+}])
+```
+
+And here's an example of how to hold down the right arrow button for a longer duration, pressing
+and releasing the spacebar in the middle (to simulate running and jumping in a platformer game,
+let's say):
+
+
+```js
+const runWithJump = {
+  type: 'key',
+  id:'keyboard',
+  actions: [
+    {type: 'keyDown', value: 'RightArrow'},
+    {type: 'pause', duration: 1500},
+    {type: 'keyDown', value: 'Space'},
+    {type: 'pause', duration: 500},
+    {type: 'keyUp', value: 'Space'},
+    {type: 'pause', duration: 500},
+    {type: 'keyUp', value: 'RightArrow'},
+    {type: 'pause', duration: 1000},
+  ]
+}
+await driver.performActions([runWithJump])
+```
+
+### Touch Actions
+
+Touch actions have not yet been implemented. Currently, only clicking found elements is possible.
 
 ### Set URL (Load Scene)
 
+You can load a Unity scene by its scene name using the set URL / navigate command. When doing so,
+use `unity://` as the scheme.
+
+```js
+await driver.navigateTo('unity://SceneName')
+```
+
 ### Get URL (Get Scene)
+
+You can get the currently active scene name as well. It will also use the `unity://` scheme.
+
+```js
+const curScene = await driver.getUrl()
+```
 
 ### Get Time Scale
 
+You can get the current game time scale using a special executeScript overload command which takes
+no arguments. The value will be returned as a float:
+
+```js
+const scale = await driver.executeScript('unity: getTimeScale', [])
+```
+
 ### Set Time Scale
+
+Likewise you can set the time scale to adjust game speed, using `unity: setTimeScale`, which takes
+a single float parameter, representing the desired time scale:
+
+```js
+// run the game at 1.5x speed
+await driver.executeScript('unity: setTimeScale', [1.5])
+```
 
 ## The TypeScript AltUnity Client
 
@@ -232,7 +335,8 @@ npm run build
 
 ### Run Tests
 
-It's always a good idea to run all tests before making any changes. First, get the sample app used in testing:
+It's always a good idea to run all tests before making any changes. First, get the sample app used
+in testing:
 
 ```
 npm run pretest
