@@ -146,10 +146,10 @@ The plugin supports a subset of the locator strategies available in Appium.
 | `id`           | Find an object by its id or AltId            | `driver.findElement('id', 'foo')` |
 | `css selector` | Find an object by its id or AltId*           | `driver.$('#foo')`                |
 | `link text`    | Find an object by its text                   | `driver.$('=text')`               |
-| `tag name`     | Find an object by its type                   | `driver.$('<Player>')             |
+| `tag name`     | Find an object by its type                   | `driver.$('<Player>')`            |
 
-* Note that the `css selector` strategy is only provided as an alias for `id`, since many client
-libraries no longer support `id` directly.
+> Note that the `css selector` strategy is only provided as an alias for `id`, since many client
+> libraries no longer support `id` directly.
 
 ### Element Interaction
 
@@ -254,7 +254,7 @@ await driver.performActions([runWithJump])
 
 ### Touch Actions
 
-Touch actions have not yet been implemented. Currently, only clicking found elements is possible.
+> Touch actions have not yet been implemented. Currently, only clicking found elements is possible.
 
 ### Set URL (Load Scene)
 
