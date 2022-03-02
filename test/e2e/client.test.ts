@@ -1,17 +1,19 @@
 // TODO test currently assumes the TestGame.app running on mac separately
 import { AltUnityClient, AltBy, AltElement, AltKeyCode } from '../../src'
-import { emptyLogger } from '../helpers'
+import { emptyLogger, startTestActivity, stopTestActivity } from '../helpers'
 import B from 'bluebird'
 
 const log = emptyLogger
 const client = new AltUnityClient({log})
 
 beforeAll(async () => {
+    await startTestActivity()
     await client.connect()
 })
 
 afterAll(async () => {
     await client.disconnect()
+    await stopTestActivity()
 })
 
 test('get the version from the server', async () => {

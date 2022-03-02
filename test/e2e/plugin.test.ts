@@ -2,18 +2,15 @@ import type { RemoteOptions, Browser } from 'webdriverio'
 import { remote, Element } from 'webdriverio'
 import { AltKeyCode, UNITY_CONTEXT } from '../../src'
 import type { ElementReference } from '@wdio/protocols'
+import { TEST_APK } from '../helpers'
 
 // assuming an Appium 2.x server with the UiAutomator2 driver installed and this plugin linked in
-// Also assumes the game is installed with the appropriate package
-// Also assumes port forwarding set up
+// also assumes port forwarding set up
 
-const APP_PKG = 'com.DefaultCompany.AppiumWorkshop'
-const APP_ACT = 'com.unity3d.player.UnityPlayerActivity'
 const capabilities = {
     platformName: 'Android',
     'appium:automationName': 'UiAutomator2',
-    'appium:appPackage': APP_PKG,
-    'appium:appActivity': APP_ACT,
+    'appium:app': TEST_APK,
     'appium:altUnityHost': 'localhost',
     'appium:altUnityPort': 13000,
 }
@@ -62,7 +59,7 @@ describe('general', () => {
 })
 
 describe('find and interact with elements', () => {
-    let player: any
+    let player: Element<'async'>
 
     beforeAll(async () => {
         const context = await driver.getContext()
@@ -77,6 +74,10 @@ describe('find and interact with elements', () => {
 
     test('get element attribute', async () => {
         expect(await player.getAttribute('name')).toEqual('Player')
+    })
+
+    test('get element displayed', async () => {
+        expect(await player.isDisplayed()).toBeTruthy()
     })
 
     test('get element location', async () => {
