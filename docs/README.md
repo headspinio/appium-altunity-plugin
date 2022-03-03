@@ -11,6 +11,7 @@
     * [Get Text](#get-text)
     * [Get Attribute](#get-attribute)
     * [Get Property](#get-property)
+    * [Set Property](#set-property)
   * [Key Actions](#key-actions)
   * [Touch Actions](#touch-actions)
   * [Set URL (Load Scene)](#set-url-(load-scene))
