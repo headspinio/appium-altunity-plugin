@@ -6,7 +6,8 @@ import AltElement, { AltElementData } from '../alt-element'
 export type FindParams = {
     by: AltBy,
     selector: string,
-    enabled?: boolean
+    enabled?: boolean,
+    contains?: boolean,
 }
 
 export type HierarchyElement = {
@@ -15,7 +16,7 @@ export type HierarchyElement = {
 }
 
 export async function findObjects(this: AltUnityClient, params: FindParams): Promise<AltElement[]> {
-    const path = getPath(params.by, params.selector)
+    const path = getPath(params.by, params.selector, params.contains)
     const cameraPath = getPath(this.cameraBy, this.cameraPath)
     const res = await this.sendSimpleCommand('findObjects', {
         by: params.by,
@@ -33,7 +34,7 @@ export async function findAllObjects(this: AltUnityClient, enabled: boolean = tr
 
 export async function findObject(this: AltUnityClient, params: FindParams): Promise<AltElement> {
     const enabled = params.enabled ?? true
-    let path = getPath(params.by, params.selector)
+    const path = getPath(params.by, params.selector, params.contains)
     const res = await this.sendSimpleCommand('findObject', {
         by: params.by,
         path,
@@ -45,7 +46,6 @@ export async function findObject(this: AltUnityClient, params: FindParams): Prom
 }
 
 function buildHierarchyFromElement(element: AltElement, allEls: AltElement[]): HierarchyElement {
-    //console.log(`examining element ${element.id} with transformid ${element.transformId} and parent ${element.transformParentId}`)
     // find all the children of this element
     const children = allEls
         .filter((child) => child.transformParentId === element.transformId)

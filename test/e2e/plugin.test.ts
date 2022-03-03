@@ -34,6 +34,31 @@ async function findAndValidate(strategy: string, selector: string) {
     return driver.$(el)
 }
 
+async function withPause<T>(fn: () => Promise<T>): Promise<T> {
+    // press escape to get menu up
+    await pressKey(AltKeyCode.Escape.toString(), 500)
+    try {
+        return await fn()
+    } finally {
+        // make sure to always dismiss menu
+        await pressKey(AltKeyCode.Escape.toString(), 500)
+    }
+}
+
+async function pressKey(key: string, duration: number) {
+    const press = {
+        type: 'key',
+        id: 'keyboard',
+        actions: [
+            {type: 'keyDown', value: key},
+            {type: 'pause', duration: duration},
+            {type: 'keyUp', value: key},
+        ]
+    }
+    await driver.performActions([press])
+}
+
+
 beforeAll(async () => {
     driver = await remote(WDIO_PARAMS)
 })
@@ -118,6 +143,22 @@ describe('find and interact with elements', () => {
     test('find by tag name', async () => {
         player = await findAndValidate('tag name', 'Player')
         expect(await player.getAttribute('name')).toEqual('Player')
+    })
+
+    test('find by link text', async () => {
+        const text = await withPause(async () => {
+            const main = await findAndValidate('link text', 'Main')
+            return await main.getText()
+        })
+        expect(text).toEqual('Main')
+    })
+
+    test('find by partial link text', async () => {
+        const text = await withPause(async () => {
+            const main = await findAndValidate('partial link text', 'Mai')
+            return await main.getText()
+        })
+        expect(text).toEqual('Main')
     })
 
 })

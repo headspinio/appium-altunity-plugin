@@ -140,13 +140,14 @@ example source document is available [here](docs/sample-source.xml).
 
 The plugin supports a subset of the locator strategies available in Appium.
 
-| Strategy       | Behaviour                                    | Example                           |
-|----------------|----------------------------------------------|-----------------------------------|
-| `xpath`        | Query the source XML for matching element(s) | `driver.$('//Player')`            |
-| `id`           | Find an object by its id or AltId            | `driver.findElement('id', 'foo')` |
-| `css selector` | Find an object by its id or AltId*           | `driver.$('#foo')`                |
-| `link text`    | Find an object by its text                   | `driver.$('=text')`               |
-| `tag name`     | Find an object by its type                   | `driver.$('<Player>')`            |
+| Strategy            | Behaviour                                       | Example                           |
+|---------------------|-------------------------------------------------|-----------------------------------|
+| `xpath`             | Query the source XML for matching element(s)    | `driver.$('//Player')`            |
+| `id`                | Find an object by its id or AltId               | `driver.findElement('id', 'foo')` |
+| `css selector`      | Find an object by its id or AltId*              | `driver.$('#foo')`                |
+| `link text`         | Find an object by its text                      | `driver.$('=text')`               |
+| `partial link text` | Find an object whose text contains the selector | `driver.$('*=tex')`               |
+| `tag name`          | Find an object by its type                      | `driver.$('<Player>')`            |
 
 > Note that the `css selector` strategy is only provided as an alias for `id`, since many client
 > libraries no longer support `id` directly.

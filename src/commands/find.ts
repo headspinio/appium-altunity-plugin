@@ -15,6 +15,7 @@ const VALID_STRATEGIES = [
     'id',
     'css selector',
     'link text',
+    'partial link text',
     'tag name',
 ]
 
@@ -26,8 +27,8 @@ export async function findElements(this: AltUnityPlugin, next: NextHandler, driv
     return await this._find(next, driver, strategy, selector, true)
 }
 
-export async function _findWithAltBy(this: AltUnityPlugin, by: AltBy, selector: string): Promise<UnityElement[]> {
-    const elements = await this.client.findObjects({by, selector})
+export async function _findWithAltBy(this: AltUnityPlugin, by: AltBy, selector: string, contains: boolean = false): Promise<UnityElement[]> {
+    const elements = await this.client.findObjects({by, selector, contains})
     return elements.map((el) => {
         const unityEl = new UnityElement(el)
         this.unityElements[unityEl.id] = unityEl
@@ -66,6 +67,10 @@ export async function _find(this: AltUnityPlugin, next: NextHandler, driver: Bas
 
             case 'link text':
                 els = await this._findWithAltBy(AltBy.TEXT, selector)
+                break
+
+            case 'partial link text':
+                els = await this._findWithAltBy(AltBy.TEXT, selector, true)
                 break
 
             case 'tag name':
