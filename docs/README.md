@@ -193,7 +193,7 @@ await player.executeScript('unity: setProperty', [args])
 ### Key Actions
 
 You can define keypress sequences using the W3C WebDriver Actions API. With this plugin, key string
-identifiers are taken from the [AltKeyCode](src/client/key-code.ts) enum. In other words, if you want to
+identifiers are taken from the [AltKeyCode](../src/client/key-code.ts) enum. In other words, if you want to
 press the escape key, you will need to use the string `Escape`, or the numeric code defined in the
 enum, `27` (but as a string, since the Actions API requires that key values be strings).
 
