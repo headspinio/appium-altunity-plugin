@@ -93,9 +93,13 @@ export default class AltElement {
         return await this.client.clickElement(this, args)
     }
 
-    async getComponentProperty(component: string, property: string, assemblyName?: string, maxDepth?: number) {
+    async getComponentProperty(component: string, property: string, assemblyName: string, maxDepth?: number) {
         return await this.client.getComponentProperty(this, component, property, assemblyName,
                                                       maxDepth)
+    }
+
+    async setComponentProperty(component: string, property: string, assemblyName: string, value: any) {
+        return await this.client.setComponentProperty(this, component, property, assemblyName, value)
     }
 }
 

@@ -22,6 +22,7 @@ import {
     getElementText,
     getElementComponents,
     getComponentProperty,
+    setComponentProperty,
     Position,
 } from './commands'
 import { AltBy } from './by'
@@ -112,6 +113,7 @@ export default class AltUnityClient {
 
     // component commands
     getComponentProperty = getComponentProperty
+    setComponentProperty = setComponentProperty
 
     constructor(opts: ClientOpts) {
         if (!opts.host) {

@@ -162,6 +162,33 @@ docs or in the third party docs. For example, the
 [BoxCollider2D](https://docs.unity3d.com/2020.3/Documentation/ScriptReference/BoxCollider2D.html)
 docs are how we can determine that this component has a `bounds` property.
 
+#### Set Property
+
+It is possible to set properties of components as well. This requires knowledge of the component
+name, a property name, and the kinds of values which are valid for the property.
+
+To set the property, call the `unity: setProperty` execute script overload. This function expects
+a single argument, an object with these keys and value types:
+
+* `elementId`: a string, the ID of the element the component is attached to (this is the WebElement
+  ID retrieved by your client, not any kind of Unity ID).
+* `component`: a string, the component name.
+* `property`: a string, the property name.
+* `value`: any type, the value to set the property to.
+
+For example, if we have an element named `player`, with a component for determining the maximum HP
+of the player via a `maxHP` property, we can adjust the player's max HP as follows:
+
+```js
+const args = {
+    elementId: player.elementId,
+    component: 'Platformer.Mechanics.Health',
+    property: 'maxHP',
+    value: 100,
+}
+await player.executeScript('unity: setProperty', [args])
+```
+
 ### Key Actions
 
 You can define keypress sequences using the W3C WebDriver Actions API. With this plugin, key string

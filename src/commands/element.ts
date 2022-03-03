@@ -94,7 +94,7 @@ export async function getProperty(this: AltUnityPlugin, next: NextHandler, _: Ba
         const componentMatch = COMPONENT_PROPERTY_RE.exec(prop)
         if (componentMatch) {
             const [, component, property] = componentMatch
-            return JSON.stringify(await el.element.getComponentProperty(component, property))
+            return JSON.stringify(await el.element.getComponentProperty(component, property, ''))
         }
 
         const allComponents = await el.element.getComponents()

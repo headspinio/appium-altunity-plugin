@@ -3,7 +3,8 @@ import { remote, Element } from 'webdriverio'
 import { AltKeyCode, UNITY_CONTEXT } from '../../src'
 import type { ElementReference } from '@wdio/protocols'
 import { TEST_APK } from '../helpers'
-import {AltComponentData} from '../../src/client/alt-component'
+import { AltComponentData } from '../../src/client/alt-component'
+import { SetPropertyArgs } from '../../src/commands'
 
 // assuming an Appium 2.x server with the UiAutomator2 driver installed and this plugin linked in
 // also assumes port forwarding set up
@@ -180,6 +181,30 @@ describe('find and interact with elements', () => {
             return await main.getText()
         })
         expect(text).toEqual('Main')
+    })
+
+    test('set element component property', async () => {
+        async function getMaxHP() {
+            return JSON.parse(await player.getProperty('Platformer.Mechanics.Health:maxHP') as string)
+        }
+        async function setMaxHP(hp: number) {
+            const args: SetPropertyArgs = {
+                elementId: player.elementId,
+                component: 'Platformer.Mechanics.Health',
+                property: 'maxHP',
+                value: hp,
+            }
+            await player.executeScript('unity: setProperty', [args])
+        }
+        const newMaxHP = 3
+        const origMaxHP = await getMaxHP()
+        expect(origMaxHP).not.toEqual(newMaxHP)
+        await setMaxHP(newMaxHP)
+        try {
+            expect(await getMaxHP()).toEqual(newMaxHP)
+        } finally {
+            await setMaxHP(origMaxHP)
+        }
     })
 
 })

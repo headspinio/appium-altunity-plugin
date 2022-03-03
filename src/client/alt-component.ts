@@ -28,9 +28,12 @@ class AltComponent {
     toJSON() { return JSON.stringify(this.data) }
     toObject() { return this.data }
 
-    async getProperty(property: string, assemblyName?: string, maxDepth?: number) {
+    async getProperty(property: string, assemblyName: string, maxDepth?: number) {
         return await this.client.getComponentProperty(this.element, this, property, assemblyName,
                                                       maxDepth)
+    }
+
+    async setProperty(property: string, assemblyName: string, value: any) {
     }
 }
 

@@ -28,6 +28,7 @@ import {
     execute,
     execute_getTimeScale,
     execute_setTimeScale,
+    execute_setComponentProperty,
 } from './commands'
 
 const EXTRA_CAPS = {
@@ -82,6 +83,7 @@ class AltUnityPlugin extends BasePlugin {
     execute = execute
     execute_getTimeScale = execute_getTimeScale
     execute_setTimeScale = execute_setTimeScale
+    execute_setComponentProperty = execute_setComponentProperty
 
     constructor(name: string) {
         super(name)
