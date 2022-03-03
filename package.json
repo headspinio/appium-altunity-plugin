@@ -52,7 +52,7 @@
     "pretest": "ts-node ./test/download.ts",
     "test:unit": "npm run build && jest ./test/unit",
     "test:e2e": "npm run build && jest ./test/e2e --runInBand",
-    "test": "npm run test:unit && npm run test:e2e"
+    "test": "npm run build && jest ./test --runInBand"
   },
   "devDependencies": {
     "@types/bluebird": "^3.5.36",
