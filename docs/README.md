@@ -141,12 +141,12 @@ strings represent JSON objects, so they should be parsed on your end for better 
    keys `componentName` and `assemblyName`. To do this use the magic property name `*`:
     ```js
     const allComponents = JSON.parse(await element.getProperty('*'))
-    // [{"componentName": "UnityEngine.Transform", "assemblyName": "UnityEngine.CoreModule"}, ...]
+    // [{componentName: "UnityEngine.Transform", assemblyName: "UnityEngine.CoreModule"}, ...]
     ```
 2. Request a single component of an element. This will return a JSON object with the same keys:
     ```js
     const component = JSON.parse(await element.getProperty('UnityEngine.Transform'))
-    // {"componentName": "UnityEngine.Transform", "assemblyName": "UnityEngine.CoreModule"}
+    // {componentName: "UnityEngine.Transform", assemblyName: "UnityEngine.CoreModule"}
     ```
 3. Request a component property using a property string like `<componentName>:<propertyName>`. This
    will return a JSON object representing the property, whose specific form is determined by the
@@ -154,7 +154,7 @@ strings represent JSON objects, so they should be parsed on your end for better 
     ```js
     const boundsProp = 'UnityEngine.BoxCollider2D:bounds'
     const bounds = JSON.parse(await element.getProperty(boundsProp))
-    // {"size": {"x": 1.2, "y": 0.3, ...}, ...}
+    // {size: {x: 1.2, y: 0.3, ...}, ...}
     ```
 
 Unfortunately there is no way to get a list of properties for components dynamically. To determine
