@@ -54,7 +54,7 @@ await driver.getPageSource()
 ```
 
 It will return an XML document that you can use as the basis for element finding operations. An
-example source document is available [here](docs/sample-source.xml).
+example source document is available [here](./sample-source.xml).
 
 ### Find Element(s)
 
