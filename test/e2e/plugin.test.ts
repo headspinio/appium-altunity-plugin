@@ -3,6 +3,7 @@ import { remote, Element } from 'webdriverio'
 import { AltKeyCode, UNITY_CONTEXT } from '../../src'
 import type { ElementReference } from '@wdio/protocols'
 import { TEST_APK } from '../helpers'
+import {AltComponentData} from '../../src/client/alt-component'
 
 // assuming an Appium 2.x server with the UiAutomator2 driver installed and this plugin linked in
 // also assumes port forwarding set up
@@ -99,6 +100,26 @@ describe('find and interact with elements', () => {
 
     test('get element attribute', async () => {
         expect(await player.getAttribute('name')).toEqual('Player')
+    })
+
+    test('get element property - comp:prop', async () => {
+        player = await findAndValidate('xpath', '//Player')
+        const propName = 'UnityEngine.BoxCollider2D:bounds'
+        const prop = JSON.parse(await player.getProperty(propName) as string) as {[key: string]: any}
+        expect(prop.size.x).toBeGreaterThan(0)
+        expect(prop.size.y).toBeGreaterThan(0)
+    })
+
+    test('get element property - all components', async () => {
+        const all = JSON.parse(await player.getProperty('*') as string) as AltComponentData[]
+        expect(all).toHaveLength(9)
+        const rigidBody = all.filter((c) => c.componentName.includes('AltUnityTester'))[0]
+        expect(rigidBody.assemblyName).toEqual('Assembly-CSharp')
+    })
+
+    test('get element property - one component', async () => {
+        const prop = JSON.parse(await player.getProperty('UnityEngine.Rigidbody2D') as string) as AltComponentData
+        expect(prop.assemblyName).toEqual('UnityEngine.Physics2DModule')
     })
 
     test('get element displayed', async () => {

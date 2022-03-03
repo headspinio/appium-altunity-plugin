@@ -14,6 +14,7 @@ import {
     getElementRect,
     getText,
     getAttribute,
+    getProperty,
     UnityElement,
     findElement,
     findElements,
@@ -68,6 +69,7 @@ class AltUnityPlugin extends BasePlugin {
     getElementRect = getElementRect
     getText = getText
     getAttribute = getAttribute
+    getProperty = getProperty
     findElement = findElement
     findElements = findElements
     _find = _find

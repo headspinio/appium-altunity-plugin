@@ -6,11 +6,13 @@ import { BaseDriver } from '@appium/base-driver'
 // for some reason tsc can't find the errors export from basedriver, but it's there
 import * as bdStar from '@appium/base-driver'
 import { AltElement, Position } from '../client'
-import { AltElementData } from '../client/alt-element'
+import { AltElementData, ALT_ELEMENT_KEYS } from '../client/alt-element'
 const { errors } = bdStar as {[name: string]: any}
 
 
 export const UNITY_ELEMENT_PREFIX = 'unity-element-'
+export const ALL_COMPONENTS_PROP = '*'
+const COMPONENT_PROPERTY_RE = /(.+):(.+)/
 
 export class UnityElement {
 
@@ -76,9 +78,36 @@ export async function getText(this: AltUnityPlugin, next: NextHandler, _: BaseDr
     })
 }
 
-export async function getAttribute(this: AltUnityPlugin, next: NextHandler, _: BaseDriver, attr: keyof AltElementData, elId: string) {
+export async function getAttribute(this: AltUnityPlugin, next: NextHandler, _: BaseDriver, attr: string, elId: string) {
     return await this.unityElementGuard(next, elId, async (el) => {
+        if (!ALT_ELEMENT_KEYS.includes(attr)) {
+            throw new Error(`Cannot get '${attr}' attribute from element`)
+        }
         const data = el.element.asUnityObject()
-        return data[attr]
+        return data[attr as keyof AltElementData]
+    })
+}
+
+export async function getProperty(this: AltUnityPlugin, next: NextHandler, _: BaseDriver, prop: string, elId: string): Promise<string> {
+    return await this.unityElementGuard(next, elId, async (el) => {
+        // then check if it's of the form 'component:property' to return a component prop directly
+        const componentMatch = COMPONENT_PROPERTY_RE.exec(prop)
+        if (componentMatch) {
+            const [, component, property] = componentMatch
+            return JSON.stringify(await el.element.getComponentProperty(component, property))
+        }
+
+        const allComponents = await el.element.getComponents()
+        // otherwise if it's the magic '*', return all components
+        if (prop === ALL_COMPONENTS_PROP) {
+            return JSON.stringify(allComponents.map((c) => c.toObject()))
+        }
+
+        // otherwise it must be the name of a component to return
+        const components = allComponents.filter((c) => c.name === prop)
+        if (!components[0]) {
+            throw new Error(`Element had no component named '${prop}'`)
+        }
+        return JSON.stringify(components[0].toObject())
     })
 }

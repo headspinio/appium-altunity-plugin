@@ -51,7 +51,6 @@ function validateKeyActions(actions: Action[])  {
 export async function _performKeyActions(this: AltUnityPlugin, actions: Action[]) {
     validateKeyActions(actions)
     for (const action of actions) {
-        console.log(action)
         if ((action.type === KEYDOWN || action.type === KEYUP) && typeof action.value === 'string') {
             // we either get a string number or a string non-number
             let code = parseInt(action.value, 10)

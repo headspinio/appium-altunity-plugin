@@ -18,6 +18,25 @@ export type AltElementData = {
     transformId: number
 }
 
+// XXX sad that we have to duplicate these because we can't generate the type from this or this
+// from the type :-(
+export const ALT_ELEMENT_KEYS = [
+    'name',
+    'id',
+    'x',
+    'y',
+    'z',
+    'mobileY',
+    'type',
+    'enabled',
+    'worldX',
+    'worldY',
+    'worldZ',
+    'idCamera',
+    'transformParentId',
+    'transformId',
+]
+
 export default class AltElement {
     private data: AltElementData
     private client: AltUnityClient
@@ -72,6 +91,11 @@ export default class AltElement {
 
     async click(args: AltTapArgs = {}) {
         return await this.client.clickElement(this, args)
+    }
+
+    async getComponentProperty(component: string, property: string, assemblyName?: string, maxDepth?: number) {
+        return await this.client.getComponentProperty(this, component, property, assemblyName,
+                                                      maxDepth)
     }
 }
 

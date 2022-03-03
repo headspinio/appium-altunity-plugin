@@ -3,12 +3,13 @@ import { AltElement } from '../alt-element'
 import { AltComponent } from '../alt-component'
 
 export async function getComponentProperty(
-    this: AltUnityClient, element: AltElement, component: AltComponent, property: string,
+    this: AltUnityClient, element: AltElement, component: AltComponent | string, property: string,
     assemblyName: string = '', maxDepth: number = 2
 ): Promise<string> {
+    const componentName = typeof component === 'string' ? component : component.name
     return await this.sendSimpleCommand('getObjectComponentProperty', {
         altUnityObject: element.asUnityObject(),
-        component: component.name,
+        component: componentName,
         property: property,
         assembly: assemblyName,
         maxDepth,

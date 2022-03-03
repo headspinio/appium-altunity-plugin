@@ -209,6 +209,39 @@ you see in the source XML.
 const name = await element.getAttribute('name')
 ```
 
+### Get Property
+
+This method is a series of overloads on the traditional W3C WebDriver `Get Property` command. You
+can basically do 3 things with it, representing retrieving information about a Unity object's
+components. All of these modes return strings due to the WebDriver protocol requirements. These
+strings represent JSON objects, so they should be parsed on your end for better interaction.
+
+1. Request all components of an element. This will return a stringified JSON array of objects with
+   keys `componentName` and `assemblyName`. To do this use the magic property name `*`:
+    ```js
+    const allComponents = JSON.parse(await element.getProperty('*'))
+    // [{"componentName": "UnityEngine.Transform", "assemblyName": "UnityEngine.CoreModule"}, ...]
+    ```
+2. Request a single component of an element. This will return a JSON object with the same keys:
+    ```js
+    const component = JSON.parse(await element.getProperty('UnityEngine.Transform'))
+    // {"componentName": "UnityEngine.Transform", "assemblyName": "UnityEngine.CoreModule"}
+    ```
+3. Request a component property using a property string like `<componentName>:<propertyName>`. This
+   will return a JSON object representing the property, whose specific form is determined by the
+   particular component.
+    ```js
+    const boundsProp = 'UnityEngine.BoxCollider2D:bounds'
+    const bounds = JSON.parse(await element.getProperty(boundsProp))
+    // {"size": {"x": 1.2, "y": 0.3, ...}, ...}
+    ```
+
+Unfortunately there is no way to get a list of properties for components dynamically. To determine
+which properties are accessible, look at the scripting reference for the component in the Unity
+docs or in the third party docs. For example, the
+[BoxCollider2D](https://docs.unity3d.com/2020.3/Documentation/ScriptReference/BoxCollider2D.html)
+docs are how we can determine that this component has a `bounds` property.
+
 ### Key Actions
 
 You can define keypress sequences using the W3C WebDriver Actions API. With this plugin, key string
