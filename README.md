@@ -211,9 +211,9 @@ const name = await element.getAttribute('name')
 ### Key Actions
 
 You can define keypress sequences using the W3C WebDriver Actions API. With this plugin, key string
-identifiers are taken from [this enum](src/client/key-code.ts). In other words, if you want to
+identifiers are taken from the [AltKeyCode](src/client/key-code.ts) enum. In other words, if you want to
 press the escape key, you will need to use the string `Escape`, or the numeric code defined in the
-enum, `27`.
+enum, `27` (but as a string, since the Actions API requires that key values be strings).
 
 Here's an example of how to press and release the escape key with a 750ms pause in between:
 
@@ -251,6 +251,10 @@ const runWithJump = {
 }
 await driver.performActions([runWithJump])
 ```
+
+Beyond the use of the special `AltKeyCode` enum for key values, the main restriction is that the
+request object must contain a single array of actions only (as in the examples; multiple
+simultaneous sequences of key presses are not allowed).
 
 ### Touch Actions
 
