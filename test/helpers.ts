@@ -7,7 +7,7 @@ import { exec } from 'child_process'
 
 const execPromise = util.promisify(exec)
 const noop = () => {}
-const TEST_APK_URL = 'https://github.com/projectxyzio/appium-altunity-plugin/releases/download/testapp-1/io.appium.unitysample.apk'
+const TEST_APK_URL = 'https://github.com/headspinio/appium-altunity-plugin/releases/download/testapp-1/io.appium.unitysample.apk'
 const TEST_DIR = path.resolve(__dirname, 'fixtures')
 export const TEST_APK = path.resolve(TEST_DIR, 'io.appium.unitysample.apk')
 export const TEST_PKG = 'io.appium.unitysample'

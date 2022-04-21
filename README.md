@@ -110,7 +110,7 @@ Contributions to this plugin are welcome! It is developed under the Apache 2 [li
 First, clone the repo:
 
 ```
-git clone git@github.com:projectxyzio/appium-altunity-plugin.git
+git clone git@github.com:headspinio/appium-altunity-plugin.git
 ```
 
 Then change into the repo dir and install dependencies:
