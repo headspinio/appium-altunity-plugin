@@ -1,5 +1,8 @@
 import { AltUnityPlugin } from '../..'
+import expect from 'expect'
 
-test('plugin is exported', () => {
-    expect(AltUnityPlugin).toBeTruthy()
+describe('plugin', () => {
+    it('should be exported', () => {
+        expect(AltUnityPlugin).toBeTruthy()
+    })
 })

@@ -1,5 +1,5 @@
 {
-    "include": ["src/**/*"],
+    "include": ["src/**/*", "test/**/*"],
     "compilerOptions": {
         "outDir": "build",
         "strict": true,
@@ -9,7 +9,8 @@
         "esModuleInterop": true,
         "moduleResolution": "Node",
         "module": "CommonJS",
-        "target": "ES2015"
+        "target": "ES2020",
+        "types": ["mocha", "expect", "node", "webdriverio/async"]
     },
     "watchOptions": {
         "excludeDirectories": ["**/node_modules", "build"]

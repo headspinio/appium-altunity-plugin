@@ -4,6 +4,7 @@ import { util } from 'appium/support'
 import { BaseDriver, errors } from 'appium/driver'
 import { AltElement, Position } from '../client'
 import { AltElementData, ALT_ELEMENT_KEYS } from '../client/alt-element'
+import {ExternalDriver} from '@appium/types'
 
 
 export const UNITY_ELEMENT_PREFIX = 'unity-element-'
@@ -44,7 +45,7 @@ export async function click(this: AltUnityPlugin, next: NextHandler, driver: Bas
     return await this.unityElementGuard(next, elId, async (el) => await el.element.tapViaCoords())
 }
 
-export async function elementDisplayed(this: AltUnityPlugin, next: NextHandler, driver: BaseDriver, elId: string) {
+export async function elementDisplayed(this: AltUnityPlugin, next: NextHandler, driver: ExternalDriver, elId: string) {
     return await this.unityElementGuard(next, elId, async (el) => {
         const {width, height} = await this.getCachedScreenDims(driver)
         const {x, y} = el.element.asUnityObject()

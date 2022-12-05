@@ -30,6 +30,7 @@ import {
     execute_setTimeScale,
     execute_setComponentProperty,
 } from './commands'
+import {ExternalDriver} from '@appium/types';
 
 const EXTRA_CAPS = {
     altUnityHost: {presence: true},
@@ -143,12 +144,12 @@ class AltUnityPlugin extends BasePlugin {
         return await fn()
     }
 
-    async getCachedScreenDims(driver: BaseDriver): Promise<Size> {
+    async getCachedScreenDims(driver: ExternalDriver): Promise<Size> {
         if (!this.cachedScreenDims) {
-            if (!('getWindowSize' in driver) || typeof driver.getWindowSize !== 'function') {
+            if (!driver.getWindowSize) {
                 throw new Error(`Tried to get window size from driver but it doesn't support it`)
             }
-            this.cachedScreenDims = await driver.getWindowSize() as Size
+            this.cachedScreenDims = await driver.getWindowSize()
         }
         return this.cachedScreenDims
     }
