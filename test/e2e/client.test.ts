@@ -1,4 +1,4 @@
-// TODO test currently assumes the TestGame.app running on mac separately
+// TODO test currently assumes the test game running and port 13000 active
 import { AltUnityClient, AltBy, AltElement, AltKeyCode } from '../../src'
 import { emptyLogger, startTestActivity, stopTestActivity } from '../helpers'
 import B from 'bluebird'

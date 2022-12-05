@@ -1,5 +1,5 @@
-import BasePlugin from '@appium/base-plugin'
-import type { BaseDriver } from '@appium/base-driver';
+import { BasePlugin } from 'appium/plugin'
+import type { BaseDriver } from 'appium/driver';
 import type { NextHandler } from './types'
 import AltUnityClient, { AltBy, AltElement, AltKeyCode } from './client';
 import {
@@ -145,7 +145,7 @@ class AltUnityPlugin extends BasePlugin {
 
     async getCachedScreenDims(driver: BaseDriver): Promise<Size> {
         if (!this.cachedScreenDims) {
-            if (!driver.getWindowSize) {
+            if (!('getWindowSize' in driver) || typeof driver.getWindowSize !== 'function') {
                 throw new Error(`Tried to get window size from driver but it doesn't support it`)
             }
             this.cachedScreenDims = await driver.getWindowSize() as Size

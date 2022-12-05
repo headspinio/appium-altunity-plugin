@@ -1,14 +1,10 @@
 import { AltUnityPlugin } from '..'
 import { NextHandler } from '../types'
-import { BaseDriver } from '@appium/base-driver'
+import { BaseDriver, errors } from 'appium/driver'
 import { select as xpathQuery } from 'xpath'
 import { DOMParser } from 'xmldom'
 import { UnityElement, UNITY_ELEMENT_PREFIX } from './element'
 import { AltBy } from '../client'
-
-// for some reason tsc can't find the errors export from basedriver, but it's there
-import * as bdStar from '@appium/base-driver'
-const { errors } = bdStar as {[name: string]: any}
 
 const VALID_STRATEGIES = [
     'xpath',
@@ -85,7 +81,7 @@ export async function _find(this: AltUnityPlugin, next: NextHandler, driver: Bas
 
         if (!multiple) {
             if (els.length < 1) {
-                throw new errors.NoSuchElementError()
+                throw new errors.NoSuchElementError(undefined)
             }
             return els[0].asW3CElementObject
         }

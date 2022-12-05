@@ -1,12 +1,10 @@
 import { AltUnityPlugin } from '..'
 import { NextHandler } from '../types'
-import { Actions, Action, BaseDriver } from '@appium/base-driver'
+import { BaseDriver, errors } from 'appium/driver'
+import type { ActionSequence, KeyActionSequence, PointerActionSequence } from '@appium/types'
 import { AltKeyCode } from '../client'
 import B from 'bluebird'
 
-// for some reason tsc can't find the errors export from basedriver, but it's there
-import * as bdStar from '@appium/base-driver'
-const { errors } = bdStar as {[name: string]: any}
 const { InvalidArgumentError } = errors
 
 const POINTER_ACTION_TYPE = 'pointer'
@@ -14,7 +12,7 @@ const PAUSE = 'pause'
 const KEYUP = 'keyUp'
 const KEYDOWN = 'keyDown'
 
-function validateActions(actions: Actions[]): Actions {
+function validateActions(actions: ActionSequence[]): ActionSequence {
     if (actions.length > 1) {
         throw new InvalidArgumentError(`The unity plugin does not allow multiple simultaneous actions. ` +
                                        `Ensure your actions object is a single sequence`)
@@ -23,13 +21,13 @@ function validateActions(actions: Actions[]): Actions {
     return actions[0]
 }
 
-function validatePointerActions(actions: Action[]) {
+function validatePointerActions(actions: PointerActionSequence) {
     throw new InvalidArgumentError(`The unity plugin does not support pointer actions yet. ` +
                                    `Use the native context for that!`)
 }
 
-function validateKeyActions(actions: Action[])  {
-    for (const action of actions) {
+function validateKeyActions(actions: KeyActionSequence)  {
+    for (const action of actions.actions) {
         if (action.type === PAUSE) {
             if (typeof action.duration !== 'number') {
                 throw new InvalidArgumentError(`Pause actions must have a duration integer in ms`)
@@ -48,9 +46,9 @@ function validateKeyActions(actions: Action[])  {
     }
 }
 
-export async function _performKeyActions(this: AltUnityPlugin, actions: Action[]) {
-    validateKeyActions(actions)
-    for (const action of actions) {
+export async function _performKeyActions(this: AltUnityPlugin, actions: ActionSequence) {
+    validateKeyActions(actions as KeyActionSequence)
+    for (const action of actions.actions) {
         if ((action.type === KEYDOWN || action.type === KEYUP) && typeof action.value === 'string') {
             // we either get a string number or a string non-number
             let code = parseInt(action.value, 10)
@@ -70,17 +68,17 @@ export async function _performKeyActions(this: AltUnityPlugin, actions: Action[]
     }
 }
 
-export async function _performPointerActions(this: AltUnityPlugin, actions: Action[]) {
-    validatePointerActions(actions)
+export async function _performPointerActions(this: AltUnityPlugin, actions: ActionSequence) {
+    validatePointerActions(actions as PointerActionSequence)
 }
 
-export async function performActions(this: AltUnityPlugin, next: NextHandler, _: BaseDriver, actions: Actions[]) {
+export async function performActions(this: AltUnityPlugin, next: NextHandler, _: BaseDriver, actions: ActionSequence[]) {
     return await this.unityContextGuard(next, async () => {
         const action = validateActions(actions)
         if (action.type === POINTER_ACTION_TYPE) {
-            await this._performPointerActions(action.actions)
+            await this._performPointerActions(action)
         } else {
-            await this._performKeyActions(action.actions)
+            await this._performKeyActions(action)
         }
     })
 }

@@ -33,18 +33,6 @@
     "README",
     "LICENSE"
   ],
-  "dependencies": {
-    "@appium/base-driver": "^8.2.4",
-    "@appium/base-plugin": "^1.7.2",
-    "@appium/support": "^2.55.4",
-    "asyncbox": "^2.9.2",
-    "bluebird": "^3.7.2",
-    "lodash": "^4.17.21",
-    "ws": "^8.5.0",
-    "xml-js": "^1.6.11",
-    "xmldom": "^0.6.0",
-    "xpath": "^0.0.32"
-  },
   "scripts": {
     "clean": "rm -rf package-lock.json && rm -rf node_modules && npm install",
     "build": "tsc",
@@ -54,7 +42,17 @@
     "test:e2e": "npm run build && jest ./test/e2e --runInBand",
     "test": "npm run build && jest ./test --runInBand"
   },
+  "dependencies": {
+    "asyncbox": "^2.9.2",
+    "bluebird": "^3.7.2",
+    "lodash": "^4.17.21",
+    "ws": "^8.5.0",
+    "xml-js": "^1.6.11",
+    "xmldom": "^0.6.0",
+    "xpath": "^0.0.32"
+  },
   "devDependencies": {
+    "@appium/types": "^0.5.0",
     "@types/bluebird": "^3.5.36",
     "@types/express": "^4.17.13",
     "@types/jest": "^27.0.1",
@@ -66,5 +64,8 @@
     "ts-node": "^10.6.0",
     "typescript": "^4.4.2",
     "webdriverio": "^7.12.5"
+  },
+  "peerDependencies": {
+    "appium": "^2.0.0-beta.46"
   }
 }

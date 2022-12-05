@@ -1,6 +1,6 @@
 import { AltUnityPlugin } from '..'
 import { NextHandler } from '../types'
-import { BaseDriver } from '@appium/base-driver'
+import { BaseDriver } from 'appium/driver'
 
 export async function getUrl(this: AltUnityPlugin, next: NextHandler, _: BaseDriver) {
     return await this.unityContextGuard(next, async () => {

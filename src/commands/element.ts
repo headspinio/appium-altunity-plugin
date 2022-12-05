@@ -1,13 +1,9 @@
 import { AltUnityPlugin } from '..'
 import { NextHandler } from '../types'
-import { util } from '@appium/support'
-import { BaseDriver } from '@appium/base-driver'
-
-// for some reason tsc can't find the errors export from basedriver, but it's there
-import * as bdStar from '@appium/base-driver'
+import { util } from 'appium/support'
+import { BaseDriver, errors } from 'appium/driver'
 import { AltElement, Position } from '../client'
 import { AltElementData, ALT_ELEMENT_KEYS } from '../client/alt-element'
-const { errors } = bdStar as {[name: string]: any}
 
 
 export const UNITY_ELEMENT_PREFIX = 'unity-element-'
@@ -38,7 +34,7 @@ export async function unityElementGuard(this: AltUnityPlugin, next: NextHandler,
     return await this.unityContextGuard(next, async () => {
         const el = this.unityElements[elId]
         if (!el) {
-            throw new errors.NoSuchElementError()
+            throw new errors.NoSuchElementError(undefined)
         }
         return await fn(el)
     })

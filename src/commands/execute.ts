@@ -1,9 +1,6 @@
 import { AltUnityPlugin } from '..'
 import { NextHandler } from '../types'
-import { BaseDriver } from '@appium/base-driver'
-// for some reason tsc can't find the errors export from basedriver, but it's there
-import * as bdStar from '@appium/base-driver'
-const { errors } = bdStar as {[name: string]: any}
+import { BaseDriver, errors } from 'appium/driver'
 
 
 export const EXECUTE_PREFIX = 'unity:'
