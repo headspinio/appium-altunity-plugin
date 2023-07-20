@@ -56,7 +56,8 @@ type AltUnityResponse = {
 type ClientOpts = {
     host?: string
     port?: number
-    log: any
+    log: any,
+    commandTimeout?: number
 }
 
 export class AltUnityError extends Error {
@@ -127,7 +128,8 @@ export default class AltUnityClient {
         this.conn = new Connection({
             log: opts.log,
             port: opts.port,
-            host: opts.host
+            host: opts.host,
+            commandTimeout: opts.commandTimeout
         })
         this.log = opts.log
         this.cameraBy = AltBy.NAME
