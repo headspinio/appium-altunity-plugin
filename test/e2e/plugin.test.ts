@@ -14,11 +14,11 @@ const capabilities = {
     platformName: 'Android',
     'appium:automationName': 'UiAutomator2',
     'appium:app': TEST_APK,
-    'appium:altUnityHost': 'localhost',
+    'appium:altUnityHost': '127.0.0.1',
     'appium:altUnityPort': 13000,
 }
 const WDIO_PARAMS: RemoteOptions = {
-    hostname: 'localhost',
+    hostname: '127.0.0.1',
     port: 4723,
     path: '/',
     connectionRetryCount: 0,

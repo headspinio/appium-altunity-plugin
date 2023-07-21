@@ -1,5 +1,4 @@
 import { BasePlugin } from 'appium/plugin'
-import type { BaseDriver } from 'appium/driver';
 import type { NextHandler } from './types'
 import AltUnityClient, { AltBy, AltElement, AltKeyCode } from './client';
 import {
@@ -102,7 +101,7 @@ class AltUnityPlugin extends BasePlugin {
         return false
     }
 
-    async createSession(next: NextHandler, driver: BaseDriver) {
+    async createSession(next: NextHandler, driver: ExternalDriver) {
         if (driver.desiredCapConstraints) {
             driver.desiredCapConstraints = {...driver.desiredCapConstraints, ...EXTRA_CAPS}
         } else {

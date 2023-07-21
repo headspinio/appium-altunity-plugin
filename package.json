@@ -16,8 +16,8 @@
     "url": "https://github.com/headspinio/appium-altunity-plugin/issues"
   },
   "engines": {
-    "node": ">=14",
-    "npm": ">=7"
+    "node": "^14.17.0 || ^16.13.0 || >=18.0.0",
+    "npm": ">=8"
   },
   "appium": {
     "pluginName": "altunity",
@@ -60,6 +60,7 @@
     "@types/mocha": "^10.0.1",
     "@types/ws": "^8.5.1",
     "@types/xmldom": "^0.1.31",
+    "appium-uiautomator2-driver": "^2.29.2",
     "expect": "^29.3.1",
     "mocha": "^10.1.0",
     "ts-node": "^10.6.0",
@@ -67,6 +68,6 @@
     "webdriverio": "7.25.1"
   },
   "peerDependencies": {
-    "appium": "^2.0.0-beta.46"
+    "appium": "^2.0.0"
   }
 }
